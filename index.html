@@ -1,0 +1,555 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>SATHI</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: top bar with role switcher, left nav (scrolling strip on phones), one working view at a time. Single calm light theme using the brief's palette. */
+:root{
+--forest:#244B40;--sage:#A8B9A4;--ivory:#F8F6F0;--white:#FFFFFF;--beige:#E9E3D7;--ink:#303631;
+--muted:#5B655D;--line:#DDD6C6;--sage-tint:#E4EBE1;--forest-tint:#DCE7E2;
+--crit:#9A3324;--crit-tint:#F4DDD7;--warn:#7A5A12;--warn-tint:#F3E8CF;--info:#2C5068;--info-tint:#E4ECF2;--lilac:#5B4366;--lilac-tint:#ECE4F0;
+--fd:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;--fb:'Figtree','Segoe UI',system-ui,sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ivory);color:var(--ink);font:16px/1.5 var(--fb);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1280px;margin:0 auto}
+h2,h3,h4{font-family:var(--fd);margin:0}
+button{font-family:inherit}
+.top{padding:14px 0;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:10px;align-items:center}
+.mark{width:38px;height:38px;border-radius:12px;background:var(--forest);display:grid;place-items:center}
+.brand b{font:700 1.25rem var(--fd);letter-spacing:.1em;color:var(--forest);display:block;line-height:1.1}
+.brand small{color:var(--muted);font-size:.74rem}
+.roles{display:flex;background:var(--beige);border-radius:12px;padding:4px;gap:2px}
+.roles button{border:0;background:transparent;padding:8px 16px;border-radius:9px;font-weight:600;font-size:.92rem;color:var(--ink);cursor:pointer;min-height:40px}
+.roles button.on{background:var(--forest);color:#fff}
+.who{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.who select{width:auto;max-width:260px;min-height:40px}
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);gap:28px;padding-top:22px}
+.nav{display:flex;flex-direction:column;gap:4px;align-self:start;position:sticky;top:12px}
+.nav button{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;border:0;background:transparent;padding:11px 14px;border-radius:10px;font-weight:600;font-size:.95rem;color:var(--ink);cursor:pointer;min-height:44px}
+.nav button:hover{background:var(--beige)}
+.nav button.on{background:var(--forest);color:#fff}
+.badge{background:var(--crit);color:#fff;border-radius:999px;font-size:.72rem;padding:1px 7px;font-weight:700}
+.tag{font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;border:1px solid currentColor;border-radius:999px;padding:1px 7px;font-weight:600;white-space:nowrap;vertical-align:middle}
+.main{min-width:0}
+.ph{margin-bottom:18px}.ph h2{font-size:1.7rem;font-weight:700}.ph p{margin:4px 0 0;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;min-width:0}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.card h3{font-size:1.05rem;font-weight:600}
+.grid{display:grid;gap:16px;margin-top:16px}.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-align:left;font:inherit;color:inherit;display:block;width:100%}
+button.tile{cursor:pointer}button.tile:hover{border-color:var(--forest)}
+.tile b{display:block;font:700 1.9rem/1.1 var(--fd);color:var(--forest)}.tile span{color:var(--muted);font-size:.85rem}
+.rows{list-style:none;margin:0;padding:0}
+.rows li{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line)}
+.rows li:first-child{border-top:0}.rows li>div:first-child{min-width:0}.rows li>div:last-child{flex:none;text-align:right}
+.t{font-weight:600}.s,.mini{color:var(--muted);font-size:.86rem}.empty{color:var(--muted);margin:6px 0}
+.chip{display:inline-flex;align-items:center;border-radius:999px;padding:3px 10px;font-weight:600;font-size:.78rem;white-space:nowrap}
+.st-New,.st-Requested{background:var(--info-tint);color:var(--info)}
+.st-Assigned,.st-Scheduled,.st-Under-maintenance,.st-Okay{background:var(--warn-tint);color:var(--warn)}
+.st-In-Progress,.st-Occupied{background:var(--sage-tint);color:var(--forest);box-shadow:inset 0 0 0 1px var(--sage)}
+.st-Awaiting-External-Support{background:var(--lilac-tint);color:var(--lilac)}
+.st-Completed,.st-Resolved,.st-Done,.st-Taken{background:var(--forest);color:#fff}
+.st-Escalated,.st-Open,.st-Needs-attention,.st-Overdue{background:var(--crit-tint);color:var(--crit)}
+.st-Cancelled,.st-Pending{background:var(--beige);color:var(--muted)}
+.st-Good,.st-Available{background:var(--forest-tint);color:var(--forest)}
+.prio{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:600}.prio i{width:9px;height:9px;border-radius:50%;background:var(--sage)}
+.p-High i{background:var(--crit)}.p-Medium i{background:#C28A1E}
+.btn{border:1px solid var(--forest);background:var(--forest);color:#fff;border-radius:11px;padding:10px 18px;font-weight:600;font-size:.95rem;cursor:pointer;min-height:44px}
+.btn:hover{background:#1b3a31}.btn.ghost{background:transparent;color:var(--forest)}.btn.ghost:hover{background:var(--forest-tint)}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:.85rem}.btn.danger{background:var(--crit);border-color:var(--crit)}
+.btn.call{background:#fff;color:var(--crit);border-color:#fff}
+.lnk{background:none;border:0;padding:0;color:var(--forest);font-weight:600;text-align:left;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:inherit}
+:focus-visible{outline:3px solid var(--sage);outline-offset:2px}
+input,select,textarea{width:100%;font:inherit;padding:10px 12px;border:1px solid #CFC7B4;border-radius:10px;background:#fff;color:var(--ink);min-height:44px}
+textarea{min-height:92px;resize:vertical}
+input[type=checkbox],input[type=radio]{width:auto;min-height:0}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.field>span{font-weight:600;font-size:.88rem}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:0 12px}
+.ck{display:flex;gap:8px;align-items:center;margin:4px 0 12px;font-size:.92rem}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}.bar input{flex:1 1 200px;width:auto}.bar select{width:auto;flex:0 1 160px}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:10px;margin-bottom:14px}
+.choice{position:relative;display:block}.choice input{position:absolute;opacity:0}
+.choice span{display:block;border:2px solid var(--line);border-radius:14px;padding:16px;font-weight:600;background:#fff;cursor:pointer}
+.choice input:checked+span{border-color:var(--forest);background:var(--forest-tint)}.choice input:focus-visible+span{outline:3px solid var(--sage)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-weight:600;font-size:.88rem;cursor:pointer;min-height:40px;color:var(--ink)}
+.tabs button.on{background:var(--forest);color:#fff;border-color:var(--forest)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr[data-a]{cursor:pointer}tr[data-a]:hover{background:var(--ivory)}
+.tg{display:inline-block;background:var(--beige);border-radius:999px;padding:2px 10px;font-size:.8rem;margin:2px 4px 2px 0}.tg.hit{background:var(--forest-tint);color:var(--forest);font-weight:600}
+.dl{display:grid;grid-template-columns:minmax(110px,max-content) minmax(0,1fr);gap:6px 16px;margin:0}.dl dt{color:var(--muted)}.dl dd{margin:0}
+.future{border:1px dashed var(--sage);background:var(--sage-tint);color:var(--forest);border-radius:12px;padding:10px 14px;margin-bottom:16px;font-size:.92rem}
+.help-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--forest);color:#fff;border-radius:16px;padding:16px 20px;margin-bottom:18px}
+.help-bar .mini{color:#D9E4DD}
+.bignum{font:700 2.4rem var(--fd);color:var(--forest);letter-spacing:.02em}
+.ov{position:fixed;inset:0;background:rgba(48,54,49,.45);display:flex;justify-content:flex-end;z-index:50;padding-right:env(safe-area-inset-right,0px)}
+.ov.center{align-items:center;justify-content:center;padding:16px}
+.dlg{background:var(--ivory);width:min(580px,100%);height:100%;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.18)}
+.dlg.c{height:auto;max-height:92vh;border-radius:18px}
+.dlg-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);background:#fff}
+.dlg-h h3{font-size:1.15rem;margin-top:2px}.dlg-body{overflow:auto;padding:18px 20px calc(18px + env(safe-area-inset-bottom,0px));flex:1}
+.dlg-body h4{margin:18px 0 8px;font-size:.95rem}
+details{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:10px 0;background:#fff}summary{cursor:pointer;font-weight:600}
+details[open] summary{margin-bottom:10px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--forest);color:#fff;padding:12px 18px;border-radius:12px;z-index:70;font-weight:600;max-width:90vw;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.room{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.room b{font:700 1.2rem var(--fd)}
+.sel{background:var(--forest-tint)}
+body[data-role=senior] .main{font-size:1.2rem}
+body[data-role=senior] .main .btn{min-height:56px;font-size:1.1rem;padding:12px 22px}
+body[data-role=senior] .main .btn.sm{min-height:48px;font-size:1rem}
+body[data-role=senior] .ph h2{font-size:2.1rem}
+body[data-role=senior] .nav button{font-size:1.08rem;min-height:54px}
+body[data-role=senior] .s,body[data-role=senior] .mini{font-size:1rem}
+body[data-role=senior] .chip{font-size:.95rem}
+body[data-role=senior] input,body[data-role=senior] select,body[data-role=senior] textarea{font-size:1.1rem;min-height:52px}
+@media(max-width:900px){.shell{grid-template-columns:minmax(0,1fr);gap:14px}
+.nav{flex-direction:row;overflow-x:auto;position:static;padding-bottom:4px}.nav button{white-space:nowrap;flex:none}}
+@media(max-width:760px){
+.roles{width:100%}.roles button{flex:1;padding:8px 4px;font-size:.84rem}
+.tbl thead{display:none}.tbl,.tbl tbody,.tbl tr,.tbl td{display:block}
+.tbl tr{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;padding:8px 12px;background:#fff;display:flex;flex-direction:column}
+.tbl td{border:0;padding:4px 0;display:flex;gap:12px;justify-content:space-between;text-align:right}
+.tbl td::before{content:attr(data-l);color:var(--muted);font-size:.78rem;flex:0 0 36%;text-align:left}
+.tbl td.ttl{order:-1;text-align:left;display:block}.tbl td.ttl::before{display:none}
+.dlg{width:100%}.card{padding:16px}.ph h2{font-size:1.4rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+<div class="wrap" id="app"></div>
+<div id="toasts" role="status" aria-live="polite"></div>
+<script>
+(function(){'use strict';
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const D=n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
+const T=()=>D(0);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const slug=s=>String(s).replace(/[^A-Za-z]+/g,'-');
+const first=n=>String(n).split(' ')[0];
+const short=(s,n=70)=>s.length>n?s.slice(0,n-1)+'…':s;
+const uid=()=>'x'+Math.random().toString(36).slice(2,9);
+const SLOTS={Morning:'8:00 AM',Afternoon:'1:30 PM',Evening:'6:00 PM',Night:'9:00 PM'};
+const STATUSES=['New','Assigned','In Progress','Awaiting External Support','Completed','Escalated'];
+const CATS=['Medicine','Appointment','Health concern','Home assistance','Follow-up','Family concern','Companionship','Resident assistance','Other'];
+const PRIOS=['High','Medium','Low'];
+const KEY='sathi-demo-v1';
+const fmtDate=s=>{if(!s)return '—';const a=s.split('-').map(Number);return new Date(a[0],a[1]-1,a[2]).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})};
+const fmtLong=s=>{const a=s.split('-').map(Number);return new Date(a[0],a[1]-1,a[2]).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})};
+const rel=s=>s===T()?'Today':s===D(1)?'Tomorrow':s===D(-1)?'Yesterday':fmtDate(s);
+const when=(d,t)=>rel(d)+(t?', '+t:'');
+const fmtTs=ts=>new Date(ts).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});
+const ago=ts=>{const m=Math.round((Date.now()-ts)/6e4);if(m<1)return 'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' h ago';if(h<48)return 'Yesterday';return fmtTs(ts).split(',')[0]};
+const tkey=t=>{const m=/(\d+):(\d+)\s*(AM|PM)/i.exec(t||'');if(!m)return 0;let h=+m[1]%12;if(m[3].toUpperCase()==='PM')h+=12;return h*60+ +m[2]};
+const dtk=o=>o.date+String(tkey(o.time)).padStart(4,'0');
+const byDT=(a,b)=>dtk(a).localeCompare(dtk(b));
+
+function seed(){
+ const now=Date.now(),H=3600e3,S={ver:1,day:T(),seq:{R:12},taken:{}};
+ S.doctors=[{id:'d1',name:'Dr. Meera Shetty',spec:'General Physician'},{id:'d2',name:'Dr. Arvind Kamath',spec:'Geriatrician'},{id:'d3',name:'Dr. Rajiv Menon',spec:'Cardiologist'}];
+ S.team=[{id:'t1',name:'Priya Nair',role:'Care Coordinator'},{id:'t2',name:'Imtiaz Sheikh',role:'Nurse'},{id:'t3',name:'Deepa Kulkarni',role:'Care Associate'},{id:'t4',name:'Suresh Babu',role:'Senior Care Manager'}];
+ S.staff=[{id:'s1',name:'Latha Shetty',role:'Nurse',shift:'Morning 7 AM–3 PM'},{id:'s2',name:'Manjunath K',role:'Caregiver',shift:'Afternoon 1–9 PM'},{id:'s3',name:'Rukmini Devi',role:'Caregiver',shift:'Morning 7 AM–3 PM'},{id:'s4',name:'Mohan Das',role:'Maintenance',shift:'General 9 AM–5 PM'}];
+ const P=(id,name,age,g,city,lang,cond,alg,doc,fam,ph,int,av,plan,extra)=>Object.assign({id,name,age,gender:g,city,lang,conditions:cond,allergies:alg,doctorId:doc,family:fam,phone:ph,interests:int,avail:av,plan,kind:'home'},extra||{});
+ S.people=[
+ P('p1','Kamala Iyer',78,'Female','Jayanagar, Bengaluru',['Kannada','Tamil','English'],['Type 2 diabetes','Hypertension'],'None known','d1',{name:'Rohan Iyer',rel:'Son',phone:'+91 90000 10011'},'+91 90000 20011',['Carnatic music','Gardening','Storytelling'],['Tue PM','Thu PM','Sat PM'],['Check blood sugar each morning and note it down','30-minute evening walk','Low-sugar diet, no fried snacks','Quarterly diabetes review']),
+ P('p2','Gopalakrishna Rao',82,'Male','Kadri, Mangaluru',['Kannada','Tulu','English'],['Osteoarthritis (knees)','Recovering from cataract surgery'],'Penicillin','d2',{name:'Sunitha Rao',rel:'Daughter',phone:'+91 90000 10012'},'+91 90000 20012',['Chess','Yakshagana','Newspaper reading'],['Mon AM','Wed AM','Fri AM'],['Eye drops as scheduled; avoid rubbing the eye','Knee exercises twice a day','Use the walking stick outdoors','Eye follow-up this week']),
+ P('p3','Fatima Begum',74,'Female','Tolichowki, Hyderabad',['Urdu','Hindi','English'],['Hypertension','Hypothyroidism'],'None known','d3',{name:'Imran Hussain',rel:'Son',phone:'+91 90000 10013'},'+91 90000 20013',['Cooking','Ghazals','Knitting'],['Mon AM','Tue AM','Sat AM'],['Record blood pressure morning and evening','Thyroid tablet on an empty stomach','Low-salt meals','Teleconsult review after BP log']),
+ P('p4','Surjit Singh Gill',80,'Male','Aundh, Pune',['Punjabi','Hindi','English'],['COPD (mild)','Hypertension'],'Dust (breathing trigger)','d1',{name:'Manpreet Gill',rel:'Daughter (lives in Toronto)',phone:'+91 90000 10014'},'+91 90000 20014',['Kirtan','Cricket','Walking'],['Wed AM','Sat AM','Sun PM'],['Inhaler every morning with spacer','Short evening walk, rest when breathless','Keep home dust-free','Breathing review every 3 months']),
+ P('p5','Lakshmi Narayanan',76,'Female','Adyar, Chennai',['Tamil','English'],['Osteoporosis','Fall risk'],'None known','d2',{name:'Venkat Narayanan',rel:'Son',phone:'+91 90000 10015'},'+91 90000 20015',['Kolam art','Bhajans','Storytelling'],['Mon PM','Thu PM','Sat PM'],['Calcium and vitamin D daily','Bathroom safety: grab bars, non-slip mat','Walk with support only','Fall-risk review at next visit']),
+ P('p6','Dasharath Patil',85,'Male','College Road, Nashik',['Marathi','Hindi'],["Parkinson's disease (early)",'Type 2 diabetes'],'None known','d2',{name:'Anjali Deshmukh',rel:'Daughter',phone:'+91 90000 10016'},'+91 90000 20016',['Marathi theatre','Chess','Bhajans'],['Tue AM','Thu AM','Sun PM'],['Tablets at fixed times, three times a day','Physiotherapy twice a week','Diabetic diet','Supervised walking']),
+ P('r1','Sarojini Menon',79,'Female','Originally from Kochi',['Malayalam','English'],['Hypertension','Osteoarthritis'],'None known','d3',{name:'Anand Menon',rel:'Son',phone:'+91 90000 10021'},'+91 90000 20021',['Carnatic music','Reading'],[],['Morning vitals','Chair yoga three times a week','Low-salt vegetarian diet'],{kind:'living',room:'102',staffId:'s1',diet:'Vegetarian, low salt'}),
+ P('r2','Ramesh Chandra Joshi',83,'Male','Originally from Jaipur',['Hindi','English'],['Type 2 diabetes','Chronic kidney disease (stage 2)'],'None known','d1',{name:'Neha Joshi',rel:'Daughter',phone:'+91 90000 10022'},'+91 90000 20022',['Chess','Hindi film songs'],[],['Blood sugar before meals','Diabetic-friendly, low-potassium diet','Daily walk with caregiver'],{kind:'living',room:'104',staffId:'s2',diet:'Diabetic-friendly, low potassium'}),
+ P('r3','Annapoorna Hegde',81,'Female','Originally from Udupi',['Kannada','Konkani'],['Osteoporosis','Cataract'],'None known','d1',{name:'Vikas Hegde',rel:'Son',phone:'+91 90000 10023'},'+91 90000 20023',['Devotional songs','Gardening'],[],['Fall-prevention walking aid','Eye drops morning and night','Gentle morning exercises'],{kind:'living',room:'201',staffId:'s1',diet:'Vegetarian'}),
+ P('r4','Bhaskar Rao Naidu',77,'Male','Originally from Vijayawada',['Telugu','English'],['COPD','Hypertension'],'Dust','d3',{name:'Padma Naidu',rel:'Daughter',phone:'+91 90000 10024'},'+91 90000 20024',['Telugu cinema','Cricket'],[],['Inhaler every morning','Breathing exercises','Oxygen level check each day'],{kind:'living',room:'203',staffId:'s3',diet:'Low salt'})];
+ const M=(id,p,name,how,slots)=>({id,personId:p,name,how,slots});
+ S.meds=[M('m1','p1','Metformin','1 tablet after food',['Morning','Night']),M('m2','p1','Amlodipine','1 tablet',['Morning']),M('m3','p2','Lubricating eye drops','1 drop in each eye',['Morning','Evening']),M('m4','p2','Calcium with vitamin D','1 tablet',['Night']),M('m5','p3','Amlodipine','1 tablet',['Morning']),M('m6','p3','Levothyroxine','1 tablet, empty stomach',['Morning']),M('m7','p4','Tiotropium inhaler','2 puffs with spacer',['Morning']),M('m8','p4','Telmisartan','1 tablet',['Morning']),M('m9','p5','Calcium with vitamin D','1 tablet',['Afternoon']),M('m11','p6','Carbidopa-levodopa','1 tablet',['Morning','Afternoon','Evening']),M('m12','p6','Metformin','1 tablet after food',['Morning','Night']),M('m13','r1','Amlodipine','1 tablet',['Morning']),M('m14','r1','Calcium with vitamin D','1 tablet',['Night']),M('m15','r2','Metformin','1 tablet after food',['Morning','Night']),M('m17','r3','Calcium with vitamin D','1 tablet',['Afternoon']),M('m18','r3','Eye drops','1 drop in each eye',['Morning','Night']),M('m19','r4','Tiotropium inhaler','2 puffs',['Morning']),M('m20','r4','Telmisartan','1 tablet',['Morning'])];
+ ['m1','m2','m3','m5','m6','m11','m13','m15','m18','m19','m20'].forEach(m=>S.taken[m+'|Morning|'+T()]=true);
+ S.rooms=[['101','Single','Ground'],['102','Single','Ground'],['103','Twin','Ground'],['104','Single','Ground'],['201','Single','First'],['202','Single','First'],['203','Twin','First'],['204','Single','First']].map(r=>({id:r[0],type:r[1],floor:r[2],maint:r[0]==='202'}));
+ S.facility={name:'SATHI Living — concept residence',note:'Fictional future facility used to show how the same platform could support residential care.',
+  meals:{Breakfast:'Idli, sambar, chutney, filter coffee',Lunch:'Rice, dal, seasonal sabzi, curd',Snack:'Fruit, roasted chana, tea',Dinner:'Chapati, light vegetable curry, khichdi on request'},
+  schedule:[['7:00 AM','Wake-up and morning vitals'],['8:00 AM','Breakfast'],['9:00 AM','Morning medicines'],['10:30 AM','Chair yoga or gentle exercise'],['1:00 PM','Lunch'],['2:00 PM','Rest hour'],['4:00 PM','Tea and community circle'],['5:30 PM','Evening walk or music'],['7:30 PM','Dinner'],['9:00 PM','Night medicines and check-in']],
+  activities:[['Today','10:30 AM','Chair yoga'],['Tomorrow','4:30 PM','Bhajan and music circle'],['Saturday','5:00 PM','Classic Hindi film evening'],['Sunday','11:00 AM','Garden hour with families']]};
+ S.maint=[{id:'mt1',roomId:'202',issue:'Air conditioner not cooling',by:'Latha Shetty',date:D(-2),assignee:'s4',status:'In Progress'},{id:'mt2',roomId:'103',issue:'Bathroom tap leaking',by:'Rukmini Devi',date:D(-1),assignee:'',status:'Open'},{id:'mt3',roomId:'102',issue:'Bedside lamp replaced',by:'Sarojini Menon',date:D(-5),assignee:'s4',status:'Done'}];
+ const rq=(id,p,title,cat,pr,asg,due,st,src,ch,hist,x)=>{x=x||{};return{id,personId:p,title,desc:x.desc||'',category:cat,priority:pr,assignee:asg,due,status:st,source:src,created:now-ch*H,updated:now-(x.upd==null?ch:x.upd)*H,delivery:x.delivery||'',resolution:x.res||'',history:hist.map(h=>({t:now-h[0]*H,who:h[1],text:h[2]}))}};
+ S.reqs=[
+ rq('R001','p1','Refill metformin and amlodipine','Medicine','High','t3',D(1),'In Progress','Senior',70,[[6,'Deepa Kulkarni','Order placed with the pharmacy. Delivery expected tomorrow.'],[26,'Deepa Kulkarni','Status: Assigned → In Progress'],[46,'Priya Nair','Assigned to Deepa Kulkarni'],[70,'Kamala Iyer (Senior)','Created. Only 3 days of tablets left.']],{desc:'Only 3 days of tablets left.',delivery:D(1),upd:6}),
+ rq('R002','p2','Follow-up: eye check after cataract surgery','Follow-up','Medium','t1',D(3),'Assigned','Doctor',30,[[22,'Priya Nair','Assigned. Teleconsult slot being confirmed.'],[30,'Dr. Arvind Kamath','Follow-up created.']],{desc:'Arrange eye check; continue eye drops as scheduled.',upd:22}),
+ rq('R003','p3','Higher blood pressure and headache reported','Health concern','High','t2',D(-1),'Awaiting External Support','Senior',52,[[3,'Imtiaz Sheikh','Waiting for Dr. Menon to review readings. Teleconsult booked.'],[28,'Imtiaz Sheikh','Status: In Progress → Awaiting External Support'],[50,'Imtiaz Sheikh','Called Fatima. BP 152/94. Advised rest and fluids.'],[52,'Fatima Begum (Senior)','Created.']],{desc:'Headache since morning and BP higher than usual.',upd:3}),
+ rq('R004','p4','Inhaler refill and spacer needed','Medicine','Medium','',D(2),'New','Family',5,[[5,'Manpreet Gill (Family)','Created. Dad\'s inhaler is almost empty.']],{desc:"Dad's inhaler is almost empty. Please arrange a refill and a spacer."}),
+ rq('R005','p5','Bathroom grab bar repair','Home assistance','High','t3',D(1),'Escalated','Senior',80,[[4,'Deepa Kulkarni','Escalated to Suresh Babu: plumber unavailable until next week, fall risk.'],[30,'Deepa Kulkarni','Status: In Progress → Escalated'],[60,'Deepa Kulkarni','Repair visit postponed twice.'],[80,'Lakshmi Narayanan (Senior)','Created.']],{desc:'The grab bar near the bathroom door is loose.',upd:4}),
+ rq('R006','p6','Arrange physiotherapy at home','Appointment','Medium','t1',D(5),'In Progress','Family',40,[[12,'Priya Nair','Two physiotherapists shortlisted. Confirming timings.'],[40,'Anjali Deshmukh (Family)','Created.']],{desc:'Papa needs physiotherapy sessions at home twice a week.',upd:12}),
+ rq('R007','p1','Follow-up: review sugar log after diet change','Follow-up','Medium','t1',D(-4),'Completed','Doctor',150,[[96,'Priya Nair','Completed after checking with the family. Sugar log reviewed by Dr. Shetty.'],[140,'Priya Nair','Assigned']],{desc:'Review the sugar log after the diet change.',res:'Sugar log reviewed by Dr. Shetty. No change needed.',upd:96}),
+ rq('R008','p2','Replace walking stick','Home assistance','Low','t3',D(-7),'Completed','Senior',200,[[170,'Deepa Kulkarni','Delivered and checked for height. Completed.'],[190,'Priya Nair','Assigned']],{desc:'The old stick is too short.',res:'New adjustable walking stick delivered and set to the right height.',upd:170}),
+ rq('R009','p4','Concern: skipped evening walk for three days','Family concern','Medium','t2',D(2),'In Progress','Family',30,[[10,'Imtiaz Sheikh','Spoke to Surjit. Feels tired after stairs. Will review at check-in.'],[30,'Manpreet Gill (Family)','Created.']],{desc:'Papa has not gone for his evening walk for three days.',upd:10}),
+ rq('R010','p3','Follow-up: BP log and thyroid blood test','Follow-up','Medium','',D(2),'New','Doctor',8,[[8,'Dr. Rajiv Menon','Follow-up created.']],{desc:'Record BP twice daily for 7 days; thyroid blood test.'}),
+ rq('R011','r2','Extra pillow and diabetic-friendly evening snack','Resident assistance','Low','s2',D(0),'In Progress','Resident',7,[[2,'Manjunath K','Pillow provided. Snack being arranged with the kitchen.'],[7,'Ramesh Joshi (Resident)','Created.']],{upd:2}),
+ rq('R012','r3','Help with morning exercises','Resident assistance','Medium','',D(2),'New','Resident',3,[[3,'Annapoorna Hegde (Resident)','Created.']],{desc:'I would like someone to guide my morning exercises.'})];
+ S.followups=[{id:'f1',personId:'p2',doctorId:'d2',instruction:'Eye check with ophthalmologist; continue eye drops.',date:D(3),reqId:'R002'},{id:'f2',personId:'p3',doctorId:'d3',instruction:'Record BP twice daily for 7 days; thyroid blood test.',date:D(2),reqId:'R010'},{id:'f3',personId:'p1',doctorId:'d1',instruction:'Review sugar log after diet change.',date:D(-4),reqId:'R007'}];
+ const A=(id,p,d,date,time,type,mode,st)=>({id,personId:p,doctorId:d,date,time,type,mode,status:st});
+ S.appts=[A('a1','p1','d1',D(5),'10:30 AM','Quarterly diabetes review','Clinic visit','Scheduled'),A('a2','p2','d2',D(3),'11:00 AM','Recovery review after cataract surgery','Teleconsult','Scheduled'),A('a3','p3','d3',D(1),'4:00 PM','Blood pressure review','Teleconsult','Scheduled'),A('a4','p6','d2',D(7),'9:30 AM','Parkinson\'s care review','Home visit','Scheduled'),A('a5','p1','d1',D(-4),'10:00 AM','Diabetes follow-up','Clinic visit','Completed'),A('a6','p4','d1',D(2),'5:00 PM','Breathing review','Teleconsult','Scheduled'),A('a7','p5','d2',D(6),'12:00 PM','Fall-risk review','Home visit','Scheduled'),A('a8','r1','d3',D(2),'10:00 AM','Weekly rounds','On site','Scheduled'),A('a9','r3','d1',D(4),'11:30 AM','Eye and bone health review','On site','Scheduled')];
+ const K=(id,p,date,time,by,mode,st,mood,note,h)=>({id,personId:p,date,time,by,mode,status:st,mood:mood||'',note:note||'',doneAt:st==='Done'?now-h*H:0});
+ S.checkins=[K('k1','p1',D(0),'6:00 PM','t2','Phone call','Scheduled'),K('k2','p2',D(1),'10:00 AM','t2','Phone call','Scheduled'),K('k3','p3',D(0),'11:00 AM','t2','Phone call','Done','Needs attention','Reports a headache. BP reading 152/94.',2),K('k4','p4',D(1),'5:30 PM','t2','Phone call','Scheduled'),K('k5','p5',D(0),'5:00 PM','t2','Home visit','Scheduled'),K('k6','p6',D(2),'9:00 AM','t2','Home visit','Scheduled'),
+  K('k7','p1',D(-1),'6:00 PM','t2','Phone call','Done','Good','Walked in the garden and took all medicines.',20),K('k8','p2',D(-1),'10:00 AM','t2','Phone call','Done','Okay','Eye slightly itchy; using drops.',30),K('k9','p4',D(-1),'5:30 PM','t2','Phone call','Done','Okay','Missed evening walk; felt tired.',22),K('k10','p5',D(-1),'5:00 PM','t2','Home visit','Done','Good','Walking carefully with support.',21),K('k11','p6',D(-1),'9:00 AM','t2','Home visit','Done','Okay','Hand tremor slightly more; managing.',32),
+  K('kr1','r1',D(0),'9:00 AM','s1','On site','Done','Good','Joined chair yoga.',9),K('kr2','r2',D(0),'2:00 PM','s2','On site','Scheduled'),K('kr3','r3',D(0),'3:00 PM','s1','On site','Scheduled'),K('kr4','r4',D(0),'9:30 AM','s3','On site','Done','Okay','Mild cough. Nurse informed.',8)];
+ const AS=(id,p,d,days,obs,asm)=>({id,personId:p,doctorId:d,date:D(days),obs,asm});
+ S.assess=[AS('as1','p1','d1',-4,'Fasting sugar 142 mg/dL in clinic; no dizziness.','Diabetes reasonably controlled. Continue diet and walking.'),AS('as2','p2','d2',-10,'Right cataract surgery a week ago; mild redness settling.','Healing as expected. Eye follow-up in two weeks.'),AS('as3','p3','d3',-12,'BP 148/92 on two readings; mild morning headaches.','Hypertension not yet at target. Home BP log requested.'),AS('as4','p4','d1',-8,'Breathless on stairs; no fever.','Mild COPD, stable. Reinforce inhaler technique.'),AS('as5','p5','d2',-15,'Slipped in bathroom last month, no fracture. Knee pain on stairs.','High fall risk. Bathroom safety measures advised.'),AS('as6','p6','d2',-6,'Right-hand tremor slightly increased; slower walking.','Early Parkinson\'s. Start physiotherapy.'),AS('as7','r1','d3',-9,'BP 138/86, comfortable at rest.','Hypertension controlled on current tablet.'),AS('as8','r2','d1',-7,'Sugar fasting 128; swelling nil.','Diabetes stable. Continue low-potassium diet.'),AS('as9','r3','d1',-11,'Vision blurry in the evenings.','Cataract progression. Review in a month.'),AS('as10','r4','d3',-5,'Mild wheeze on exertion.','COPD stable. Monitor oxygen daily.')];
+ S.companions=[
+  {id:'c1',name:'Aditi Rao',type:'Volunteer',age:21,lang:['Kannada','English','Hindi'],interests:['Carnatic music','Storytelling','Gardening'],avail:['Tue PM','Sat PM','Sat AM'],bio:'College student who plays the veena and enjoys listening to life stories.'},
+  {id:'c2',name:'Rahul Deshpande',type:'Volunteer',age:24,lang:['Marathi','Hindi','English'],interests:['Chess','Cricket','Marathi theatre'],avail:['Wed AM','Tue AM','Sun PM'],bio:'Software tester and weekend chess player.'},
+  {id:'c3',name:'Meenakshi Sundaram',type:'Companion',age:62,lang:['Tamil','English','Kannada'],interests:['Bhajans','Kolam art','Storytelling'],avail:['Mon PM','Thu PM','Sat PM'],bio:'Retired school teacher who leads a bhajan group.'},
+  {id:'c4',name:'Zoya Khan',type:'Volunteer',age:27,lang:['Urdu','Hindi','English'],interests:['Cooking','Ghazals','Knitting'],avail:['Mon AM','Tue AM','Sat AM'],bio:'Food blogger who loves learning family recipes.'},
+  {id:'c5',name:'Gurpreet Kaur',type:'Companion',age:58,lang:['Punjabi','Hindi'],interests:['Kirtan','Walking','Cooking'],avail:['Wed AM','Sat AM','Sun PM'],bio:'Community volunteer and morning walk enthusiast.'}];
+ S.visits=[{id:'v1',personId:'p1',companionId:'c1',date:D(2),time:'4:00 PM',status:'Scheduled',notes:'',ask:''},{id:'v2',personId:'p3',companionId:'c4',date:D(-5),time:'11:00 AM',status:'Completed',notes:'Cooked sheer khurma together and swapped recipes. Fatima was cheerful and spoke about her grandchildren.',ask:''},{id:'v3',personId:'p3',companionId:'c4',date:D(3),time:'11:00 AM',status:'Scheduled',notes:'',ask:''},{id:'v4',personId:'p5',companionId:'',date:'',time:'',status:'Requested',notes:'',ask:'I would like someone to talk to in the evenings, maybe about bhajans.'}];
+ S.events=[{id:'e1',title:'Bhajan and Music Circle',date:D(4),time:'5:00 PM',place:'Community hall (proposed venue)',desc:'Group singing of bhajans and light classical songs.',participants:['p1'],attended:[],status:'Upcoming'},{id:'e2',title:'Intergenerational Storytelling Hour',date:D(9),time:'4:00 PM',place:'Community hall (proposed venue)',desc:'Seniors share stories with young volunteers.',participants:[],attended:[],status:'Upcoming'},{id:'e3',title:'Morning Walk and Chai Meet',date:D(-6),time:'7:00 AM',place:'Neighbourhood park',desc:'Easy walk followed by tea.',participants:['p2','p4','p6'],attended:['p2','p4'],status:'Completed'}];
+ S.incidents=[{id:'i1',personId:'p5',concern:'Near fall in the bathroom, no injury reported',t:now-72*H,handler:'t2',esc:'Doctor informed',actions:'Nurse called and checked for injury. Advised rest. Grab bar repair requested (R005).',followup:'Fall-risk review at next visit',status:'Resolved'},{id:'i2',personId:'p4',concern:'Breathlessness after walking',t:now-26*H,handler:'t2',esc:'Not escalated',actions:'Phone guidance on inhaler use and rest. Family informed.',followup:'Check-in tomorrow',status:'Resolved'},{id:'i3',personId:'r4',concern:'Mild cough and slightly low oxygen reading',t:now-3*H,handler:'s1',esc:'Doctor informed',actions:'Nurse monitoring hourly. Dr. Menon informed.',followup:'Review on rounds tomorrow',status:'Open'}];
+ const U=(p,h,who,text,kind,req)=>({id:uid(),personId:p,t:now-h*H,who,text,kind:kind||'update',reqId:req||''});
+ S.feed=[U('p1',5,'Deepa Kulkarni','Medicine refill is being arranged. Delivery is expected tomorrow.','update','R001'),U('p1',20,'Imtiaz Sheikh','Check-in: Kamala walked in the garden and took all her medicines.','activity'),U('p1',96,'Priya Nair','Completed: sugar log review. No change needed.','update','R007'),U('p1',100,'Dr. Meera Shetty','Dr. Meera Shetty recorded an assessment and requested a follow-up.','clinical'),
+ U('p2',22,'Priya Nair','Priya Nair is responsible for the eye check follow-up. A teleconsult slot is being confirmed.','update','R002'),U('p2',30,'Dr. Arvind Kamath','Dr. Arvind Kamath recorded a clinical update. A follow-up is needed this week.','clinical'),U('p2',170,'Deepa Kulkarni','Completed: new walking stick delivered and set to the right height.','update','R008'),
+ U('p3',2,'Imtiaz Sheikh','Fatima reported a headache and higher blood pressure. Dr. Menon will review by teleconsult tomorrow at 4:00 PM.','update','R003'),U('p3',120,'Zoya Khan','Visit completed with Zoya Khan: cooked sheer khurma together. Fatima was cheerful.','visit'),U('p3',118,'Priya Nair','Next visit planned with Zoya Khan.','visit'),
+ U('p4',5,'SATHI Care Team','We received your request: inhaler refill and spacer needed.','update','R004'),U('p4',10,'Imtiaz Sheikh','Imtiaz spoke to Surjit about the missed walks. He feels tired after stairs; we will review at the next check-in.','update','R009'),
+ U('p5',4,'Deepa Kulkarni','The bathroom grab bar repair has been escalated to the senior care manager because the plumber is unavailable.','update','R005'),U('p5',72,'Imtiaz Sheikh','Incident logged: near fall in the bathroom, no injury. The nurse checked in by phone.','incident'),
+ U('p6',12,'Priya Nair','Two physiotherapists have been shortlisted for home sessions.','update','R006'),U('p6',32,'Imtiaz Sheikh','Check-in: hand tremor slightly more than usual. Managing daily tasks.','activity'),
+ U('r1',9,'Latha Shetty','Morning check-in: Sarojini is doing well and joined chair yoga.','activity'),U('r1',50,'SATHI Living team','Family visiting hours this Sunday are 11 AM to 5 PM.','notice'),U('r2',2,'Manjunath K','Extra pillow provided. The evening snack request is being handled.','update','R011'),U('r4',3,'Latha Shetty','Incident logged: mild cough. The nurse is monitoring and Dr. Menon has been informed.','incident')];
+ return S}
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.ver===1&&o.day===T())return o}}catch(e){}return seed()}
+let S=load();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const UI={role:'senior',who:{senior:'p1',doctor:'d1',team:'t1',family:'p1'},view:{senior:'dash',doctor:'dash',team:'dash',family:'dash'},modal:null,top:0,
+ f:{q:'',status:'',cat:'',prio:'',asg:'',scope:'',mstatus:''},tab:{comp:'match',living:'overview',famReq:'concern'},livingRes:{senior:'r1',family:null},sel:{doctor:null},updPatient:null};
+const PP=id=>S.people.find(p=>p.id===id);
+const DOC=id=>S.doctors.find(d=>d.id===id);
+const nameOf=id=>{const m=S.team.find(t=>t.id===id)||S.staff.find(t=>t.id===id);return m?m.name:'Unassigned'};
+const CMP=id=>S.companions.find(c=>c.id===id);
+const me=()=>nameOf(UI.who.team);
+const isOpen=r=>r.status!=='Completed';
+const overdue=r=>r.due&&r.due<T()&&r.status!=='Completed';
+const home=()=>S.people.filter(p=>p.kind==='home');
+const residents=()=>S.people.filter(p=>p.kind==='living');
+const nid=()=>{S.seq.R=(S.seq.R||0)+1;return 'R'+String(S.seq.R).padStart(3,'0')};
+const val=(fd,k)=>String(fd.get(k)||'').trim();
+const lastCheck=pid=>S.checkins.filter(k=>k.personId===pid&&k.status==='Done').sort((a,b)=>b.doneAt-a.doneAt)[0];
+const upAppts=f=>S.appts.filter(a=>a.status==='Scheduled'&&a.date>=T()&&(f?f(a):true)).sort(byDT);
+const pendingFU=()=>S.followups.filter(f=>{const r=S.reqs.find(x=>x.id===f.reqId);return !r||r.status!=='Completed'});
+const doses=pid=>{const o=[],ord=Object.keys(SLOTS);S.meds.filter(m=>m.personId===pid).forEach(m=>m.slots.forEach(s=>{const key=m.id+'|'+s+'|'+T();o.push({m,s,key,taken:!!S.taken[key]})}));return o.sort((a,b)=>ord.indexOf(a.s)-ord.indexOf(b.s))};
+const famName=p=>p.family.name+' ('+p.family.rel+')';
+function addUpdate(pid,text,kind,who,reqId){S.feed.unshift({id:uid(),personId:pid,t:Date.now(),who:who||'SATHI Care Team',text,kind:kind||'update',reqId:reqId||''})}
+function logReq(r,who,text){r.history.unshift({t:Date.now(),who,text});r.updated=Date.now()}
+function createReq(o){
+ const pr=o.priority||'Medium',p=PP(o.personId);
+ const r={id:nid(),personId:o.personId,title:o.title,desc:o.desc||'',category:o.category,priority:pr,assignee:o.assignee||'',due:o.due||D(pr==='High'?1:pr==='Medium'?3:5),status:o.assignee?'Assigned':'New',source:o.source,created:Date.now(),updated:Date.now(),delivery:o.delivery||'',resolution:'',history:[]};
+ logReq(r,o.by,'Created ('+o.source+')'+(o.desc?': '+short(o.desc,90):''));
+ S.reqs.unshift(r);
+ let ft=o.famText;
+ if(ft===undefined){ft=o.source==='Senior'||o.source==='Resident'?first(p.name)+' raised a request: '+r.title+'. The Care Team has received it.':o.source==='Family'?'We received your request: '+r.title+'.':null}
+ if(ft)addUpdate(o.personId,ft,'update',o.source==='Family'?'SATHI Care Team':o.by,r.id);
+ return r}
+function setStatus(r,st,by,note){
+ if(r.status===st)return;
+ const old=r.status;r.status=st;logReq(r,by,'Status: '+old+' → '+st+(note?' — '+note:''));
+ const nm=r.assignee?nameOf(r.assignee):'A team member';
+ const m={'Assigned':nm+' is now responsible for: '+r.title+'.','In Progress':'Work has started: '+r.title+'.','Awaiting External Support':'We are waiting on outside support for: '+r.title+'.','Escalated':'"'+r.title+'" has been escalated to the senior care manager for faster attention.','Completed':'Completed: '+r.title+'.'+(r.resolution?' '+r.resolution:''),'New':'"'+r.title+'" has been reopened.'}[st];
+ if(m)addUpdate(r.personId,m,'update',by,r.id)}
+const lastFam=r=>{const u=S.feed.filter(x=>x.reqId===r.id).sort((a,b)=>b.t-a.t)[0];return u?u:null};
+// ---- components
+const chip=(s,c)=>'<span class="chip st-'+slug(c||s)+'">'+esc(s)+'</span>';
+const prio=p=>'<span class="prio p-'+p+'"><i></i>'+p+'</span>';
+const tags=(a,hit)=>a.map(x=>'<span class="tg '+((hit||[]).includes(x)?'hit':'')+'">'+esc(x)+'</span>').join('');
+const dl=pairs=>'<dl class="dl">'+pairs.map(p=>'<dt>'+p[0]+'</dt><dd>'+p[1]+'</dd>').join('')+'</dl>';
+const card=(t,b,act,cls)=>'<section class="card '+(cls||'')+'">'+(t?'<div class="card-h"><h3>'+t+'</h3>'+(act||'')+'</div>':'')+b+'</section>';
+const empty=t=>'<p class="empty">'+t+'</p>';
+const rows=(a,fn,msg)=>a.length?'<ul class="rows">'+a.map(x=>'<li>'+fn(x)+'</li>').join('')+'</ul>':empty(msg);
+const prop=t=>t+' <span class="tag">Proposed</span>';
+const futureBar=t=>'<div class="future"><b>Proposed future service.</b> '+t+'</div>';
+const ph=(t,s)=>'<div class="ph"><h2>'+t+'</h2>'+(s?'<p>'+s+'</p>':'')+'</div>';
+const btn=(l,a,d,c)=>'<button type="button" class="btn '+(c||'')+'" data-a="'+a+'"'+Object.keys(d||{}).map(k=>' data-'+k+'="'+esc(d[k])+'"').join('')+'>'+l+'</button>';
+const tile=(n,l,at)=>at?'<button class="tile" '+at+'><b>'+n+'</b><span>'+l+'</span></button>':'<div class="tile"><b>'+n+'</b><span>'+l+'</span></div>';
+const tabs=(key,list)=>'<div class="tabs" role="tablist">'+list.map(t=>'<button role="tab" class="'+(UI.tab[key]===t[0]?'on':'')+'" data-a="tab" data-k="'+key+'" data-v="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>';
+const opts=(arr,sel,fn)=>arr.map(x=>{const v=fn?fn(x)[0]:x,l=fn?fn(x)[1]:x;return '<option value="'+esc(v)+'"'+(String(v)===String(sel)?' selected':'')+'>'+esc(l)+'</option>'}).join('');
+const field=(l,inner)=>'<label class="field"><span>'+l+'</span>'+inner+'</label>';
+const kindLabel={update:'Update',activity:'Care activity',visit:'Visit',clinical:'Doctor',incident:'Incident',notice:'Notice'};
+const feedList=(items,showName)=>rows(items,u=>'<div><div class="s">'+(showName?'<b>'+esc(PP(u.personId).name)+'</b> · ':'')+esc(u.who)+' · '+ago(u.t)+'</div><div>'+esc(u.text)+'</div></div><span class="tag">'+kindLabel[u.kind]+'</span>','Nothing here yet.');
+const moodChip=pid=>{const k=lastCheck(pid);return k?chip(k.mood,k.mood):chip('No check-in yet','Pending')};
+const doseRow=(d,act)=>'<div><div class="t">'+esc(d.m.name)+'</div><div class="s">'+SLOTS[d.s]+' · '+esc(d.m.how)+'</div></div><div>'+(d.taken?chip('Taken','Taken'):act?btn('Mark taken','taken',{id:d.key},'sm'):chip('Not yet','Cancelled'))+'</div>';
+const apptRow=(a,showP)=>'<div><div class="t">'+(showP?esc(PP(a.personId).name)+' · ':'')+esc(a.type)+'</div><div class="s">'+esc(DOC(a.doctorId).name)+' · '+esc(a.mode)+'</div></div><div class="s">'+when(a.date,a.time)+'</div>';
+const reqRowSimple=r=>'<div><div class="t">'+esc(r.title)+'</div><div class="s">'+(r.assignee?'Handled by '+esc(nameOf(r.assignee)):'Waiting to be assigned')+' · due '+rel(r.due)+'</div></div><div>'+chip(r.status)+'</div>';
+const helpBar=()=>'<div class="help-bar"><div><b>Need help right now?</b><div class="mini">Call the SATHI support line. Prototype only: no real call is placed.</div></div><button class="btn call" data-a="call">Call for help</button></div>';
+const dlgH=(t,sub)=>'<div class="dlg-h"><div style="min-width:0"><div class="mini">'+(sub||'')+'</div><h3>'+t+'</h3></div><button type="button" class="btn ghost sm" data-a="close">Close</button></div>';
+function toast(m){const c=document.getElementById('toasts');c.innerHTML='';const d=document.createElement('div');d.className='toast';d.textContent=m;c.appendChild(d);setTimeout(()=>d.remove(),3400)}
+function commit(msg){save();render();if(msg)toast(msg)}
+// ---- shared living view
+function livingView(pid,role){
+ const p=PP(pid),F=S.facility,st=S.staff.find(s=>s.id===p.staffId),ds=doses(pid),ck=lastCheck(pid);
+ const mine=S.reqs.filter(r=>r.personId===pid).sort((a,b)=>b.created-a.created);
+ const pick=role==='senior'||role==='family'?'<div class="bar"><label class="mini" for="lres">Preview resident</label><select id="lres" data-chg="livingRes" aria-label="Resident">'+opts(residents(),pid,r=>[r.id,r.name+' · Room '+r.room])+'</select></div>':'';
+ const room=S.rooms.find(r=>r.id===p.room);
+ const top=card('Room and care team',dl([['Room',esc(p.room)+' · '+esc(room.type)+' · '+esc(room.floor)+' floor'],['Caregiver',st?esc(st.name)+' ('+esc(st.role)+', '+esc(st.shift)+')':'Not assigned'],['Doctor',esc(DOC(p.doctorId).name)],['Diet',esc(p.diet)],['Wellbeing',moodChip(pid)+(ck?'<div class="s">'+esc(ck.note)+' · '+ago(ck.doneAt)+'</div>':'')]]));
+ const sched=card('Daily schedule',rows(F.schedule,s=>'<div class="t">'+s[0]+'</div><div>'+esc(s[1])+'</div>'));
+ const meds=card('Medicine schedule today',rows(ds,d=>doseRow(d,role==='senior'),'No medicines listed.'));
+ const meals=card('Meals today',rows(Object.keys(F.meals),k=>'<div class="t">'+k+'</div><div>'+esc(F.meals[k])+'</div>'));
+ const care=card('Care activities',rows(p.plan,x=>'<div>'+esc(x)+'</div>'));
+ const act=card('Upcoming activities',rows(F.activities,a=>'<div class="t">'+esc(a[2])+'</div><div class="s">'+a[0]+', '+a[1]+'</div>'));
+ let extra='';
+ if(role==='senior')extra=card('Ask for help',
+  '<form data-form="livingReq"><input type="hidden" name="pid" value="'+pid+'">'+field('What do you need?','<select name="kind"><option value="help">Help from staff</option><option value="health">A health concern</option><option value="room">Room repair or cleaning</option></select>')+field('Short description','<textarea name="desc" required placeholder="For example: I would like an extra blanket."></textarea>')+'<button class="btn">Send request</button></form><h4 style="margin-top:16px">My requests</h4>'+rows(mine,reqRowSimple,'No requests yet.'));
+ if(role==='family')extra=card('Care updates and important communication',feedList(S.feed.filter(u=>u.personId===pid).sort((a,b)=>b.t-a.t).slice(0,8)))+card('Raise a concern',famForm(pid));
+ return futureBar('SATHI Living is a planned residential model. The resident below is fictional and this view uses concept data only.')+pick+ph(esc(p.name),'Room '+esc(p.room)+' · '+esc(F.name))+'<div class="grid g2" style="margin-top:0">'+top+meds+sched+meals+care+act+extra+'</div>'}
+function famForm(pid){return '<form data-form="famReq"><input type="hidden" name="pid" value="'+pid+'">'+field('This is a','<select name="type"><option value="concern">Concern</option><option value="request">Request</option></select>')+field('Tell us what is happening','<textarea name="desc" required placeholder="A few words are enough."></textarea>')+'<label class="ck"><input type="checkbox" name="urgent"> This is urgent</label><button class="btn">Send to Care Team</button></form>'}
+const views={senior:{},doctor:{},team:{},family:{}};
+const sp=()=>PP(UI.who.senior);
+const medTable=pid=>{const m=S.meds.filter(x=>x.personId===pid);return m.length?'<div class="tw"><table class="tbl"><thead><tr><th>Medicine</th><th>How</th><th>When</th></tr></thead><tbody>'+m.map(x=>'<tr><td class="ttl" data-l="Medicine"><b>'+esc(x.name)+'</b></td><td data-l="How">'+esc(x.how)+'</td><td data-l="When">'+x.slots.map(s=>s+' '+SLOTS[s]).join(', ')+'</td></tr>').join('')+'</tbody></table></div>':empty('No medicines listed.')};
+const evCard=(e,pid,canReg)=>{const reg=e.participants.includes(pid);return '<li><div><div class="t">'+esc(e.title)+'</div><div class="s">'+when(e.date,e.time)+' · '+esc(e.place)+'</div><div class="s">'+esc(e.desc)+'</div></div><div>'+(canReg?(reg?chip('Registered','Done')+'<div style="margin-top:6px">'+btn('Cancel','reg',{id:e.id},'ghost sm')+'</div>':btn('I would like to attend','reg',{id:e.id},'sm')):reg?chip('Registered','Done'):'')+'</div></li>'};
+views.senior.dash=()=>{
+ const p=sp(),t=T(),ds=doses(p.id),tk=ds.filter(d=>d.taken).length;
+ const ap=upAppts(a=>a.personId===p.id),ck=S.checkins.filter(k=>k.personId===p.id&&k.status==='Scheduled').sort(byDT);
+ const op=S.reqs.filter(r=>r.personId===p.id&&isOpen(r)),vs=S.visits.filter(v=>v.personId===p.id&&(v.status==='Scheduled'||v.status==='Requested')).sort(byDT);
+ const ev=S.events.filter(e=>e.status==='Upcoming').sort(byDT);
+ return helpBar()+ph('Namaste, '+esc(first(p.name))+' ji',fmtLong(t))+
+ '<div class="tiles">'+tile(tk+' of '+ds.length,'Medicines taken today')+tile(ck.filter(k=>k.date===t).length,'Check-ins today')+tile(ap.filter(a=>a.date===t).length,'Appointments today')+tile(op.length,'Open requests')+'</div><div class="grid g2">'+
+ card('Medicine schedule today',rows(ds,d=>doseRow(d,true),'No medicines today.'))+
+ card('Upcoming health check-ins',rows(ck,k=>'<div><div class="t">'+esc(k.mode)+' with '+esc(nameOf(k.by))+'</div></div><div class="s">'+when(k.date,k.time)+'</div>','No check-ins planned.'))+
+ card('Doctor appointments',rows(ap,a=>apptRow(a),'No appointments coming up.'))+
+ card('My pending requests',rows(op,reqRowSimple,'You have no pending requests.'),btn('New request','nav',{v:'request'},'sm'))+
+ card(prop('Companionship and community'),rows(vs,v=>'<div><div class="t">'+(v.companionId?'Visit with '+esc(CMP(v.companionId).name):'Companion visit requested')+'</div><div class="s">'+(v.companionId?'Companion':'The Care Team is finding a match')+'</div></div><div class="s">'+(v.date?when(v.date,v.time):chip('Requested'))+'</div>','No visits yet.')+'<h4 style="margin:14px 0 4px;font-size:.95rem">Upcoming activities</h4>'+rows(ev.slice(0,2),e=>'<div><div class="t">'+esc(e.title)+'</div></div><div class="s">'+when(e.date,e.time)+'</div>','None.'),btn('Open','nav',{v:'community'},'sm ghost'))+'</div>'};
+views.senior.care=()=>{const p=sp(),ap=S.appts.filter(a=>a.personId===p.id).sort(byDT),rq=S.reqs.filter(r=>r.personId===p.id);
+ return helpBar()+ph('My Care','Your details, care plan and what is being done for you.')+'<div class="grid g2" style="margin-top:0">'+
+ card('Personal information',dl([['Name',esc(p.name)],['Age',p.age],['Lives in',esc(p.city)],['Languages',esc(p.lang.join(', '))],['Health',esc(p.conditions.join(', '))],['Allergies',esc(p.allergies)],['My doctor',esc(DOC(p.doctorId).name)+', '+esc(DOC(p.doctorId).spec)],['Family contact',esc(famName(p))]]))+
+ card('Care plan',rows(p.plan,x=>'<div>'+esc(x)+'</div>'))+card('Medicine schedule',medTable(p.id),'','')+
+ card('Appointment details',rows(ap,a=>apptRow(a)+'<div>'+chip(a.status)+'</div>','No appointments.'))+
+ card('Pending care activities',rows(rq.filter(isOpen),reqRowSimple,'Nothing pending.'))+card('Previous care activities',rows(rq.filter(r=>!isOpen(r)),r=>'<div><div class="t">'+esc(r.title)+'</div><div class="s">'+esc(r.resolution||'Completed')+'</div></div><div>'+chip('Completed')+'</div>','Nothing completed yet.'))+'</div>'};
+views.senior.request=()=>{const p=sp(),mine=S.reqs.filter(r=>r.personId===p.id).sort((a,b)=>b.created-a.created).slice(0,6);
+ const C=['Medicine assistance','Doctor appointment','Health concern','Home assistance','Other'];
+ return helpBar()+ph('Request Assistance','Tell us what you need. Your Care Team will see it straight away.')+card('',
+ '<form data-form="seniorReq"><div class="choices" role="radiogroup" aria-label="Type of request">'+C.map((c,i)=>'<label class="choice"><input type="radio" name="cat" value="'+c+'"'+(i===0?' checked':'')+'><span>'+c+'</span></label>').join('')+'</div>'+field('What do you need?','<textarea name="desc" required placeholder="A few words are enough."></textarea>')+'<button class="btn">Submit request</button></form>')+
+ '<div class="grid">'+card('My recent requests',rows(mine,reqRowSimple,'No requests yet.'))+'</div>'};
+views.senior.support=()=>{const p=sp();
+ return helpBar()+ph('Contact Support','A person is always a phone call away.')+'<div class="grid g2" style="margin-top:0">'+
+ card('Call SATHI Support','<div class="bignum">+91 90000 00000</div><p class="s">Demonstration number. Prototype interaction: no real call is placed.</p>'+btn('Call now','call',{},'danger')+'<p class="s">In the proposed model you can dial this number from any phone. You do not need this app.</p>')+
+ card('Prefer a call back?','<p>The Care Team will call you.</p><form data-form="callback"><button class="btn">Request a call back</button></form>')+
+ card('My contacts',dl([['Family',esc(famName(p))+'<br>'+esc(p.family.phone)],['Doctor',esc(DOC(p.doctorId).name)]]))+'</div>'};
+views.senior.community=()=>{const p=sp(),vs=S.visits.filter(v=>v.personId===p.id&&v.status!=='Cancelled').sort(byDT),ev=S.events.filter(e=>e.status==='Upcoming').sort(byDT),hist=S.events.filter(e=>e.attended.includes(p.id));
+ const pend=vs.some(v=>v.status==='Requested');
+ return futureBar('Companionship and community activities are planned services. Nothing here is operating yet.')+helpBar()+ph('My Community','Visits, company and activities.')+'<div class="grid g2" style="margin-top:0">'+
+ card('My companion visits',rows(vs,v=>'<div><div class="t">'+(v.companionId?esc(CMP(v.companionId).name):'Looking for a companion')+'</div><div class="s">'+esc(v.status==='Completed'?v.notes:v.ask||'')+'</div></div><div>'+(v.date?'<div class="s">'+when(v.date,v.time)+'</div>':'')+chip(v.status)+'</div>','No visits yet.'))+
+ card('Ask for a companion visit',pend?'<p>Your request is with the Care Team. They will match you with someone.</p>':'<form data-form="visitAsk">'+field('What would you enjoy doing together?','<textarea name="ask" required placeholder="For example: chat about music, play chess."></textarea>')+field('Best time','<select name="pref"><option>Mornings</option><option>Afternoons</option><option>Evenings</option></select>')+'<button class="btn">Request a visit</button></form>')+
+ card('Upcoming activities','<ul class="rows">'+ev.map(e=>evCard(e,p.id,true)).join('')+'</ul>')+
+ card('My participation',rows(hist,e=>'<div><div class="t">'+esc(e.title)+'</div></div><div class="s">'+fmtDate(e.date)+'</div>','No activities attended yet.'))+'</div>'};
+views.senior.living=()=>helpBar()+livingView(UI.livingRes.senior||'r1','senior');
+// ---- Doctor
+const myPts=()=>S.people.filter(p=>p.doctorId===UI.who.doctor);
+const ptTag=p=>p.kind==='living'?' <span class="tag">SATHI Living</span>':'';
+views.doctor.dash=()=>{const pts=myPts(),ids=pts.map(p=>p.id),ap=upAppts(a=>ids.includes(a.personId)),fu=pendingFU().filter(f=>f.doctorId===UI.who.doctor);
+ const up=S.feed.filter(u=>ids.includes(u.personId)).sort((a,b)=>b.t-a.t).slice(0,6);
+ return ph(esc(DOC(UI.who.doctor).name),esc(DOC(UI.who.doctor).spec)+' · '+fmtLong(T()))+'<div class="tiles">'+tile(pts.length,'Assigned patients')+tile(ap.length,'Upcoming appointments')+tile(fu.length,'Pending follow-ups')+'</div><div class="grid g2">'+
+ card('Assigned patients',rows(pts,p=>'<div><button class="lnk" data-a="selPatient" data-id="'+p.id+'">'+esc(p.name)+'</button>'+ptTag(p)+'<div class="s">'+p.age+' · '+esc(p.conditions.join(', '))+'</div></div><div>'+moodChip(p.id)+'</div>'))+
+ card('Upcoming appointments',rows(ap,a=>apptRow(a,true),'None scheduled.'))+
+ card('Pending follow-ups',rows(fu,f=>{const r=S.reqs.find(x=>x.id===f.reqId);return '<div><div class="t">'+esc(PP(f.personId).name)+'</div><div class="s">'+esc(f.instruction)+' · by '+fmtDate(f.date)+'</div></div><div>'+(r?chip(r.status):'')+'</div>'},'No pending follow-ups.'))+
+ card('Recent patient updates',feedList(up,true))+'</div>'};
+views.doctor.records=()=>{const pts=myPts(),q=(UI.f.q||'').toLowerCase(),list=pts.filter(p=>!q||p.name.toLowerCase().includes(q));
+ if(!UI.sel.doctor||!pts.find(p=>p.id===UI.sel.doctor))UI.sel.doctor=pts[0]&&pts[0].id;
+ const p=PP(UI.sel.doctor);let rec='';
+ if(p){const as=S.assess.filter(a=>a.personId===p.id).sort((a,b)=>b.date.localeCompare(a.date)),op=S.reqs.filter(r=>r.personId===p.id&&isOpen(r)),fus=S.followups.filter(f=>f.personId===p.id);
+  rec='<div class="grid" style="margin-top:0">'+card(esc(p.name)+ptTag(p),dl([['Age / sex',p.age+' · '+p.gender],['Lives in',esc(p.city)],['Languages',esc(p.lang.join(', '))],['Conditions',esc(p.conditions.join(', '))],['Allergies',esc(p.allergies)],['Latest wellbeing',moodChip(p.id)],['Family',esc(famName(p))]]),btn('Record clinical update','recordFor',{id:p.id},'sm'))+
+  card('Current medicines',medTable(p.id))+card('Current care plan',rows(p.plan,x=>'<div>'+esc(x)+'</div>'))+
+  card('Previous assessments',rows(as,a=>'<div><div class="s">'+fmtDate(a.date)+' · '+esc(DOC(a.doctorId).name)+'</div><div><b>Observation:</b> '+esc(a.obs)+'</div><div><b>Assessment:</b> '+esc(a.asm)+'</div></div>','None recorded.'))+
+  card('Pending concerns',rows(op,r=>'<div><div class="t">'+esc(r.title)+'</div><div class="s">'+esc(r.category)+' · '+esc(r.source)+'</div></div><div>'+chip(r.status)+'</div>','No open concerns.'))+
+  card('Follow-up history',rows(fus,f=>{const r=S.reqs.find(x=>x.id===f.reqId);return '<div><div>'+esc(f.instruction)+'</div><div class="s">By '+fmtDate(f.date)+'</div></div><div>'+(r?chip(r.status):'')+'</div>'},'No follow-ups yet.'))+'</div>'}
+ return ph('Patient Records','Select a patient to see their record.')+'<div class="bar"><input id="q" data-inp="q" placeholder="Search patients" aria-label="Search patients" value="'+esc(UI.f.q)+'"></div><div class="tabs">'+list.map(p=>'<button class="'+(p.id===UI.sel.doctor?'on':'')+'" data-a="selPatient" data-id="'+p.id+'">'+esc(p.name)+(p.kind==='living'?' · Living':'')+'</button>').join('')+'</div>'+rec};
+views.doctor.update=()=>{const pts=myPts(),sel=UI.updPatient&&pts.find(p=>p.id===UI.updPatient)?UI.updPatient:(pts[0]&&pts[0].id);
+ return ph('Clinical Updates','Record only what matters clinically. Follow-ups go straight to the Care Team.')+'<div class="future">Demonstration interface. It is not a diagnostic or prescribing system.</div>'+card('',
+ '<form data-form="clinical">'+field('Patient','<select name="pid">'+opts(pts,sel,p=>[p.id,p.name+(p.kind==='living'?' (SATHI Living)':'')])+'</select>')+field('Observations','<textarea name="obs" placeholder="What you noticed"></textarea>')+field('Assessment','<textarea name="asm" placeholder="Your assessment"></textarea>')+field('Care plan changes (one per line)','<textarea name="plan"></textarea>')+field('Follow-up instructions','<textarea name="fu" placeholder="What the Care Team should arrange"></textarea>')+'<div class="fgrid">'+field('Follow-up date','<input type="date" name="fdate" value="'+D(7)+'" min="'+T()+'">')+'</div><label class="ck"><input type="checkbox" name="urgent"> Mark follow-up as high priority</label><button class="btn">Save update</button></form>')};
+const odChip=r=>overdue(r)?' '+chip('Overdue'):'';
+function filtReqs(med){const f=UI.f;let r=S.reqs.filter(x=>!med||x.category==='Medicine');
+ if(f.q&&!med){const q=f.q.toLowerCase();r=r.filter(x=>(x.title+PP(x.personId).name+x.category+nameOf(x.assignee)).toLowerCase().includes(q))}
+ const st=med?f.mstatus:f.status;
+ if(st==='__open')r=r.filter(isOpen);else if(st==='__overdue')r=r.filter(overdue);else if(st)r=r.filter(x=>x.status===st);
+ if(!med){if(f.cat)r=r.filter(x=>x.category===f.cat);if(f.prio)r=r.filter(x=>x.priority===f.prio);
+  if(f.asg)r=r.filter(x=>f.asg==='__none'?!x.assignee:x.assignee===f.asg);if(f.scope)r=r.filter(x=>PP(x.personId).kind===f.scope)}
+ return r.sort((a,b)=>(a.status==='Completed')-(b.status==='Completed')||a.due.localeCompare(b.due))}
+const attention=()=>S.reqs.filter(r=>isOpen(r)&&(r.status==='New'||r.status==='Escalated'||overdue(r))).sort((a,b)=>(b.status==='Escalated')-(a.status==='Escalated')||a.due.localeCompare(b.due));
+views.team.dash=()=>{const c=s=>S.reqs.filter(r=>r.status===s).length,fu=pendingFU(),oi=S.incidents.filter(i=>i.status==='Open'),vq=S.visits.filter(v=>v.status==='Requested'),ck=S.checkins.filter(k=>k.status==='Scheduled'&&k.date<=T()).sort(byDT);
+ const f=v=>'data-a="tileFilter" data-v="'+v+'"';
+ return ph('Good day, '+esc(first(me())),'What needs attention across all patients.')+'<div class="tiles">'+tile(c('New'),'New requests',f('status:New'))+tile(c('Assigned'),'Assigned tasks',f('status:Assigned'))+tile(c('In Progress'),'In-progress tasks',f('status:In Progress'))+tile(fu.length,'Pending follow-ups','data-a="nav" data-v="appts"')+tile(S.reqs.filter(overdue).length,'Overdue',f('status:__overdue'))+tile(c('Escalated'),'Escalated concerns',f('status:Escalated'))+tile(c('Completed'),'Completed tasks',f('status:Completed'))+'</div><div class="grid g2">'+
+ card('Needs attention now',rows(attention(),r=>'<div><div class="t">'+esc(r.title)+'</div><div class="s">'+esc(PP(r.personId).name)+' · '+esc(r.category)+' · '+(r.assignee?esc(nameOf(r.assignee)):'Unassigned')+'</div></div><div>'+chip(r.status)+odChip(r)+'<div style="margin-top:6px">'+btn('Open','openReq',{id:r.id},'sm')+'</div></div>','Nothing needs attention.'),'','')+
+ card('Open incidents',rows(oi,i=>'<div><div class="t">'+esc(PP(i.personId).name)+'</div><div class="s">'+esc(i.concern)+' · '+ago(i.t)+'</div></div><div>'+btn('Open','openInc',{id:i.id},'sm')+'</div>','No open incidents.'))+
+ card('Check-ins due',rows(ck,k=>'<div><div class="t">'+esc(PP(k.personId).name)+'</div><div class="s">'+esc(k.mode)+' · '+when(k.date,k.time)+'</div></div><div>'+btn('Record','checkin',{id:k.id},'sm')+'</div>','All check-ins are up to date.'))+
+ card(prop('Companion visit requests'),rows(vq,v=>'<div><div class="t">'+esc(PP(v.personId).name)+'</div><div class="s">'+esc(v.ask)+'</div></div><div>'+btn('Find match','openMatch',{id:v.personId},'sm')+'</div>','No new requests.'))+
+ card('Recent activity',feedList(S.feed.slice().sort((a,b)=>b.t-a.t).slice(0,6),true))+'</div>'};
+function reqTable(list,med){
+ const head=med?['Patient','Medicine requirement','Assigned','Expected delivery','Status']:['Patient','Requirement','Category','Priority','Assigned','Due','Status','Last update'];
+ const row=r=>{const p=PP(r.personId),t='<td class="ttl" data-l="Requirement"><button class="lnk" data-a="openReq" data-id="'+r.id+'">'+esc(r.title)+'</button><div class="s">'+r.id+' · from '+esc(r.source)+'</div></td>',pt='<td data-l="Patient">'+esc(p.name)+(p.kind==='living'?' <span class="tag">Living</span>':'')+'</td>',as='<td data-l="Assigned">'+(r.assignee?esc(nameOf(r.assignee)):'<span class="s">Unassigned</span>')+'</td>';
+  return '<tr data-a="openReq" data-id="'+r.id+'">'+(med?pt+t+as+'<td data-l="Expected delivery">'+(r.delivery?fmtDate(r.delivery):'—')+'</td><td data-l="Status">'+chip(r.status)+'</td>':pt+t+'<td data-l="Category">'+esc(r.category)+'</td><td data-l="Priority">'+prio(r.priority)+'</td>'+as+'<td data-l="Due">'+fmtDate(r.due)+odChip(r)+'</td><td data-l="Status">'+chip(r.status)+'</td><td data-l="Last update">'+ago(r.updated)+'</td>')+'</tr>'};
+ return list.length?'<div class="tw"><table class="tbl"><thead><tr>'+head.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+list.map(row).join('')+'</tbody></table></div>':empty('No requirements match these filters.')}
+views.team.manage=()=>{const f=UI.f,sel=(k,l,o)=>'<select id="f-'+k+'" data-chg="f" data-k="'+k+'" aria-label="'+l+'"><option value="">'+l+'</option>'+o+'</select>';
+ return ph('Care Management','Every requirement, who owns it and what is still pending.')+'<div class="bar"><input id="q" data-inp="q" placeholder="Search patient, requirement, person" aria-label="Search" value="'+esc(f.q)+'">'+
+ sel('status','All statuses','<option value="__open"'+(f.status==='__open'?' selected':'')+'>Open only</option><option value="__overdue"'+(f.status==='__overdue'?' selected':'')+'>Overdue</option>'+opts(STATUSES,f.status))+
+ sel('cat','All categories',opts(CATS,f.cat))+sel('prio','All priorities',opts(PRIOS,f.prio))+
+ sel('asg','All owners','<option value="__none"'+(f.asg==='__none'?' selected':'')+'>Unassigned</option>'+opts(S.team.concat(S.staff),f.asg,m=>[m.id,m.name]))+
+ sel('scope','Homecare and Living','<option value="home"'+(f.scope==='home'?' selected':'')+'>Homecare only</option><option value="living"'+(f.scope==='living'?' selected':'')+'>SATHI Living only</option>')+
+ btn('New requirement','newReq',{},'')+btn('Clear','clearF',{},'ghost sm')+'</div>'+card('',reqTable(filtReqs(false),false))};
+views.team.meds=()=>ph('Medicine Coordination','Refills and deliveries for every patient.')+'<div class="bar"><select id="f-mstatus" data-chg="f" data-k="mstatus" aria-label="Status"><option value="">All statuses</option><option value="__open"'+(UI.f.mstatus==='__open'?' selected':'')+'>Open only</option>'+opts(STATUSES,UI.f.mstatus)+'</select>'+btn('New medicine requirement','newReq',{cat:'Medicine'})+'</div>'+card('',reqTable(filtReqs(true),true));
+views.team.appts=()=>{const ap=upAppts(),fu=pendingFU().sort((a,b)=>a.date.localeCompare(b.date)),ck=S.checkins.filter(k=>k.status==='Scheduled').sort(byDT);
+ return ph('Appointments and Follow-ups','Upcoming visits, what doctors asked for, and wellbeing check-ins.')+'<div class="grid g2" style="margin-top:0">'+
+ card('Upcoming appointments',rows(ap,a=>apptRow(a,true)+'<div>'+btn('Done','apptDone',{id:a.id},'sm')+' '+btn('Cancel','apptCancel',{id:a.id},'ghost sm')+'</div>','None scheduled.'),btn('Schedule appointment','newAppt',{},'sm'))+
+ card('Pending follow-ups',rows(fu,f=>{const r=S.reqs.find(x=>x.id===f.reqId);return '<div><div class="t">'+esc(PP(f.personId).name)+'</div><div class="s">'+esc(f.instruction)+'</div><div class="s">'+esc(DOC(f.doctorId).name)+' · by '+fmtDate(f.date)+'</div></div><div>'+(r?chip(r.status)+'<div style="margin-top:6px">'+btn('Open','openReq',{id:r.id},'sm')+'</div>':'')+'</div>'},'No pending follow-ups.'))+
+ card('Wellbeing check-ins',rows(ck,k=>'<div><div class="t">'+esc(PP(k.personId).name)+'</div><div class="s">'+esc(k.mode)+' · '+when(k.date,k.time)+'</div></div><div>'+btn('Record','checkin',{id:k.id},'sm')+'</div>','None scheduled.'))+'</div>'};
+views.team.emergency=()=>{const L=S.incidents.slice().sort((a,b)=>b.t-a.t);
+ return ph('Emergency Coordination','Incident records and who is handling them.')+'<div class="future"><b>Proposed emergency model.</b> Seniors and families would reach support by calling a direct phone line, without opening this app. Demonstration number: <b>+91 90000 00000</b> (prototype only). No emergency centre or partner service is operational today.</div><div class="bar">'+btn('Log incident','newInc')+'</div>'+
+ card('','<div class="tw"><table class="tbl"><thead><tr><th>Patient</th><th>Concern</th><th>Reported</th><th>Handler</th><th>Escalation</th><th>Actions taken</th><th>Follow-up</th><th>Status</th></tr></thead><tbody>'+L.map(i=>'<tr data-a="openInc" data-id="'+i.id+'"><td data-l="Patient">'+esc(PP(i.personId).name)+'</td><td class="ttl" data-l="Concern"><button class="lnk" data-a="openInc" data-id="'+i.id+'">'+esc(i.concern)+'</button></td><td data-l="Reported">'+fmtTs(i.t)+'</td><td data-l="Handler">'+esc(nameOf(i.handler))+'</td><td data-l="Escalation">'+esc(i.esc)+'</td><td data-l="Actions">'+esc(short(i.actions||'—',60))+'</td><td data-l="Follow-up">'+esc(short(i.followup||'—',40))+'</td><td data-l="Status">'+chip(i.status)+'</td></tr>').join('')+'</tbody></table></div>')};
+const score=(p,c)=>{const si=p.interests.filter(x=>c.interests.includes(x)),sl=p.lang.filter(x=>c.lang.includes(x)),sa=p.avail.filter(x=>c.avail.includes(x));return{si,sl,sa,n:si.length*2+sl.length+sa.length*2}};
+views.team.comp=()=>{const t=UI.tab.comp;let b='';
+ if(t==='match')b='<div class="grid g2" style="margin-top:0">'+home().map(p=>{const pv=S.visits.find(v=>v.personId===p.id&&v.status==='Requested'),nx=S.visits.filter(v=>v.personId===p.id&&v.status==='Scheduled').sort(byDT)[0],att=S.events.filter(e=>e.attended.includes(p.id)).length;
+  return card(esc(p.name),'<div class="s">Interests</div>'+tags(p.interests)+'<div class="s">Languages: '+esc(p.lang.join(', '))+'</div><div class="s">Available: '+esc(p.avail.join(', '))+'</div><div class="s">Activities attended: '+att+'</div>'+(pv?'<p>'+chip('Visit requested')+' “'+esc(pv.ask)+'”</p>':nx?'<p class="s">Next visit: '+esc(CMP(nx.companionId).name)+', '+when(nx.date,nx.time)+'</p>':'')+'<div style="margin-top:10px">'+btn(pv?'Find a match':'Suggest matches','openMatch',{id:p.id},pv?'sm':'sm ghost')+'</div>')}).join('')+'</div>';
+ if(t==='visits')b=card('',S.visits.length?'<div class="tw"><table class="tbl"><thead><tr><th>Senior</th><th>Companion</th><th>When</th><th>Status</th><th>Interaction notes</th><th></th></tr></thead><tbody>'+S.visits.slice().sort((a,b)=>(b.date||'9').localeCompare(a.date||'9')).map(v=>'<tr><td class="ttl" data-l="Senior"><b>'+esc(PP(v.personId).name)+'</b></td><td data-l="Companion">'+(v.companionId?esc(CMP(v.companionId).name):'Not matched yet')+'</td><td data-l="When">'+(v.date?when(v.date,v.time):'—')+'</td><td data-l="Status">'+chip(v.status)+'</td><td data-l="Notes">'+esc(v.notes||v.ask||'—')+'</td><td>'+(v.status==='Requested'?btn('Find match','openMatch',{id:v.personId},'sm'):v.status==='Scheduled'?btn('Record interaction','recVisit',{id:v.id},'sm'):'')+'</td></tr>').join('')+'</tbody></table></div>':empty('No visits.'));
+ if(t==='comps')b='<div class="grid g2" style="margin-top:0">'+S.companions.map(c=>card(esc(c.name)+' <span class="tag">'+c.type+'</span>','<p class="s">Age '+c.age+' · '+esc(c.bio)+'</p>'+tags(c.interests)+'<div class="s">Languages: '+esc(c.lang.join(', '))+'</div><div class="s">Available: '+esc(c.avail.join(', '))+'</div><div class="s">Visits completed: '+S.visits.filter(v=>v.companionId===c.id&&v.status==='Completed').length+'</div>')).join('')+'</div>';
+ if(t==='events'){const up=S.events.filter(e=>e.status==='Upcoming').sort(byDT),past=S.events.filter(e=>e.status==='Completed').sort(byDT);
+  b='<div class="bar">'+btn('Create event','newEvent')+'</div><div class="grid g2" style="margin-top:0">'+card('Upcoming',rows(up,e=>'<div><div class="t">'+esc(e.title)+'</div><div class="s">'+when(e.date,e.time)+' · '+esc(e.place)+'</div><div class="s">'+e.participants.length+' registered: '+esc(e.participants.map(id=>first(PP(id).name)).join(', ')||'none yet')+'</div></div><div>'+btn('Manage','openEvent',{id:e.id},'sm')+'</div>','No upcoming events.'))+card('Past events',rows(past,e=>'<div><div class="t">'+esc(e.title)+'</div><div class="s">'+fmtDate(e.date)+' · attended '+e.attended.length+' of '+e.participants.length+'</div></div>','None yet.'))+card('Participation history',rows(home(),p=>'<div class="t">'+esc(p.name)+'</div><div class="s">'+S.events.filter(e=>e.attended.includes(p.id)).length+' attended · '+S.events.filter(e=>e.participants.includes(p.id)&&e.status==='Upcoming').length+' registered</div>'))+'</div>'}
+ return futureBar('Companionship and community are proposed services. This module shows how the Care Team would run them.')+ph('Companionship and Community','Interest → match → visit → notes → next visit.')+tabs('comp',[['match','Interests and matches'],['visits','Visits'],['comps','Companions'],['events','Events']])+b};
+views.team.living=()=>{const t=UI.tab.living,F=S.facility,R=residents(),st=r=>r.maint?'Under maintenance':R.some(x=>x.room===r.id)?'Occupied':'Available';let b='';
+ const occ=S.rooms.filter(r=>st(r)==='Occupied').length;
+ if(t==='overview')b='<div class="tiles">'+tile(occ+' of '+S.rooms.length,'Rooms occupied')+tile(S.rooms.filter(r=>st(r)==='Available').length,'Rooms available')+tile(S.rooms.filter(r=>r.maint).length,'Under maintenance')+tile(S.checkins.filter(k=>PP(k.personId).kind==='living'&&k.date===T()&&k.status==='Done').length+' of '+S.checkins.filter(k=>PP(k.personId).kind==='living'&&k.date===T()).length,'Check-ins done today')+tile(S.reqs.filter(r=>PP(r.personId).kind==='living'&&isOpen(r)).length,'Open resident requests')+tile(S.maint.filter(m=>m.status!=='Done').length,'Open maintenance')+'</div><div class="grid g2">'+card(esc(F.name),'<p>'+esc(F.note)+'</p>')+card('Meals',rows(Object.keys(F.meals),k=>'<div class="t">'+k+'</div><div>'+esc(F.meals[k])+'</div>'))+card('Daily schedule',rows(F.schedule,s=>'<div class="t">'+s[0]+'</div><div>'+esc(s[1])+'</div>'))+card('Activities',rows(F.activities,a=>'<div class="t">'+esc(a[2])+'</div><div class="s">'+a[0]+', '+a[1]+'</div>'))+'</div>';
+ if(t==='residents')b='<div class="grid g2" style="margin-top:0">'+R.map(p=>card(esc(p.name),dl([['Room',esc(p.room)],['Caregiver',esc(nameOf(p.staffId))],['Doctor',esc(DOC(p.doctorId).name)],['Wellbeing',moodChip(p.id)],['Open requests',S.reqs.filter(r=>r.personId===p.id&&isOpen(r)).length]]),btn('Open record','openRes',{id:p.id},'sm'))).join('')+'</div>';
+ if(t==='rooms')b='<div class="rgrid">'+S.rooms.map(r=>{const o=R.find(x=>x.room===r.id),s=st(r);return '<div class="room"><b>'+r.id+'</b> '+chip(s,s)+'<div class="s">'+r.type+' · '+r.floor+'</div><div class="t">'+(o?esc(o.name):'—')+'</div>'+(s==='Available'?'<form data-form="roomAlloc" style="margin-top:8px"><input type="hidden" name="room" value="'+r.id+'"><select name="pid" aria-label="Resident">'+opts(R,'',x=>[x.id,x.name+' (room '+x.room+')'])+'</select><button class="btn sm" style="margin-top:6px">Allocate</button></form>':'')+(s!=='Occupied'?'<div style="margin-top:6px">'+btn(r.maint?'Return to service':'Set under maintenance','roomMaint',{id:r.id},'ghost sm')+'</div>':'')+'</div>'}).join('')+'</div>';
+ if(t==='staff')b='<div class="grid g2" style="margin-top:0">'+S.staff.map(s=>card(esc(s.name),dl([['Role',esc(s.role)],['Shift',esc(s.shift)],['Residents',esc(R.filter(p=>p.staffId===s.id).map(p=>p.name).join(', ')||'—')],['Open tasks',S.reqs.filter(r=>r.assignee===s.id&&isOpen(r)).length+S.maint.filter(m=>m.assignee===s.id&&m.status!=='Done').length]]))).join('')+'</div>';
+ if(t==='requests')b='<div class="grid g2" style="margin-top:0">'+card('Resident requests',rows(S.reqs.filter(r=>PP(r.personId).kind==='living'),r=>'<div><button class="lnk" data-a="openReq" data-id="'+r.id+'">'+esc(r.title)+'</button><div class="s">'+esc(PP(r.personId).name)+' · '+esc(nameOf(r.assignee))+'</div></div><div>'+chip(r.status)+'</div>','None.'))+card('Maintenance requests',rows(S.maint,m=>'<div><div class="t">Room '+m.roomId+': '+esc(m.issue)+'</div><div class="s">'+esc(m.by)+' · '+fmtDate(m.date)+' · '+esc(nameOf(m.assignee))+'</div></div><div>'+chip(m.status)+(m.status!=='Done'?'<div style="margin-top:6px">'+btn(m.status==='Open'?'Start':'Mark done','maintNext',{id:m.id},'sm')+'</div>':'')+'</div>','None.'),btn('New request','newMaint',{},'sm'))+'</div>';
+ if(t==='family')b='<div class="grid g2" style="margin-top:0">'+card('Post a family update','<form data-form="famPost">'+field('Resident','<select name="pid">'+opts(R,'',x=>[x.id,x.name])+'</select>')+field('Message','<textarea name="text" required></textarea>')+'<button class="btn">Send to family</button></form>')+card('Recent updates',feedList(S.feed.filter(u=>PP(u.personId).kind==='living').sort((a,b)=>b.t-a.t).slice(0,8),true))+'</div>';
+ return futureBar('SATHI Living is a proposed residential model. Facility, residents and staff are fictional concept data.')+ph('SATHI Living','Residential operations on the same platform.')+tabs('living',[['overview','Overview'],['residents','Residents'],['rooms','Rooms'],['staff','Staff'],['requests','Requests'],['family','Family updates']])+b};
+const fp=()=>PP(UI.who.family);
+views.family.dash=()=>{const p=fp(),ds=doses(p.id),tk=ds.filter(d=>d.taken).length,ck=lastCheck(p.id),nx=S.checkins.filter(k=>k.personId===p.id&&k.status==='Scheduled').sort(byDT)[0],ap=upAppts(a=>a.personId===p.id),rq=S.reqs.filter(r=>r.personId===p.id),fd=S.feed.filter(u=>u.personId===p.id).sort((a,b)=>b.t-a.t);
+ return ph(esc(p.name)+(p.kind==='living'?' <span class="tag">SATHI Living</span>':''),'How '+esc(first(p.name))+' is doing · '+fmtLong(T()))+
+ card('Wellbeing summary','<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">'+moodChip(p.id)+'<span>'+(ck?esc(ck.note)+' <span class="s">('+ago(ck.doneAt)+')</span>':'No check-in recorded yet.')+'</span></div><div class="tiles" style="margin-top:14px">'+tile(tk+' of '+ds.length,'Medicines taken today')+tile(ap[0]?rel(ap[0].date):'None','Next appointment')+tile(nx?rel(nx.date):'None','Next check-in')+tile(rq.filter(isOpen).length,'Open requirements')+'</div>')+
+ '<div class="grid g2">'+card('Pending requirements',rows(rq.filter(isOpen),r=>'<div><div class="t">'+esc(r.title)+'</div><div class="s">'+(r.assignee?esc(nameOf(r.assignee)):'Not yet assigned')+' · expected '+rel(r.due)+'</div></div><div>'+chip(r.status)+'</div>','Nothing pending.'),btn('Details','nav',{v:'track'},'sm ghost'))+
+ card('Completed requirements',rows(rq.filter(r=>!isOpen(r)),r=>'<div><div class="t">'+esc(r.title)+'</div><div class="s">'+esc(r.resolution||'Completed')+'</div></div><div>'+chip('Completed')+'</div>','None yet.'))+
+ card('Upcoming appointments',rows(ap,a=>apptRow(a),'None scheduled.'))+
+ card('Medicine coordination',rows(rq.filter(r=>r.category==='Medicine'),r=>'<div><div class="t">'+esc(r.title)+'</div><div class="s">'+(r.delivery?'Expected delivery '+rel(r.delivery):'Delivery date to be confirmed')+'</div></div><div>'+chip(r.status)+'</div>','No medicine requirements.')+'<div class="s" style="margin-top:8px">Today: '+tk+' of '+ds.length+' doses taken.</div>')+
+ card('Latest care team updates',feedList(fd.filter(u=>u.kind==='update'||u.kind==='notice').slice(0,4)))+card('Recent care activities',feedList(fd.filter(u=>u.kind!=='update'&&u.kind!=='notice').slice(0,4)))+'</div>'};
+views.family.track=()=>{const p=fp(),rq=S.reqs.filter(r=>r.personId===p.id).sort((a,b)=>isOpen(b)-isOpen(a)||a.due.localeCompare(b.due));
+ return ph('Care Tracking','Every requirement for '+esc(first(p.name))+', from start to finish.')+'<div class="grid" style="margin-top:0">'+(rq.map(r=>{const u=lastFam(r);return card(esc(r.title)+' '+chip(r.status),dl([['To do',esc(r.desc||r.title)],['Assigned to',r.assignee?esc(nameOf(r.assignee)):'Not yet assigned'],['Expected',rel(r.due)],['Latest update',u?esc(u.text)+' <span class="s">'+ago(u.t)+'</span>':'Received. We will update you soon.']].concat(r.resolution?[['Resolution',esc(r.resolution)]]:[])))}).join('')||empty('No requirements yet.'))+'</div>'};
+views.family.comms=()=>{const p=fp(),fd=S.feed.filter(u=>u.personId===p.id).sort((a,b)=>b.t-a.t);
+ return ph('Communication','Updates from the Care Team and a full history.')+'<div class="grid g2" style="margin-top:0">'+card('Raise a request or concern',famForm(p.id))+card('Care activity history',feedList(fd))+'</div>'};
+views.family.comp=()=>{const p=fp(),vs=S.visits.filter(v=>v.personId===p.id&&v.status!=='Cancelled').sort(byDT),ev=S.events.filter(e=>e.status==='Upcoming').sort(byDT),hist=S.events.filter(e=>e.attended.includes(p.id));
+ return futureBar('Companionship and community are proposed services. This shows what families would see.')+ph('Companionship and Community','Visits and activities for '+esc(first(p.name)))+'<div class="grid g2" style="margin-top:0">'+
+ card('Visits and companions',rows(vs,v=>'<div><div class="t">'+(v.companionId?esc(CMP(v.companionId).name):'Companion being matched')+'</div><div class="s">'+esc(v.status==='Completed'?v.notes:v.ask)+'</div></div><div>'+(v.date?'<div class="s">'+when(v.date,v.time)+'</div>':'')+chip(v.status)+'</div>','No visits yet.'))+
+ card('Upcoming events','<ul class="rows">'+ev.map(e=>evCard(e,p.id,false)).join('')+'</ul>')+card('Participation updates',rows(hist,e=>'<div><div class="t">Attended '+esc(e.title)+'</div></div><div class="s">'+fmtDate(e.date)+'</div>','No participation yet.'))+'</div>'};
+views.family.living=()=>{const p=fp();return livingView(p.kind==='living'?p.id:(UI.livingRes.family||'r1'),'family')};
+// ---- modals
+const assignees=r=>S.team.concat(PP(r.personId).kind==='living'?S.staff:[]);
+function reqModal(id){const r=S.reqs.find(x=>x.id===id),p=PP(r.personId),done=r.status==='Completed',esc_=r.status==='Escalated';
+ const stOpts=['New','Assigned','In Progress','Awaiting External Support'];if(done||esc_)stOpts.push(r.status);
+ return dlgH(esc(r.title),r.id+' · '+esc(p.name))+'<div class="dlg-body"><div>'+chip(r.status)+odChip(r)+' '+prio(r.priority)+'</div>'+(r.desc?'<p>'+esc(r.desc)+'</p>':'')+dl([['Source',esc(r.source)],['Category',esc(r.category)],['Created',fmtTs(r.created)]].concat(r.resolution?[['Resolution',esc(r.resolution)]]:[]))+
+ '<h4>Update</h4><form data-form="reqSave"><input type="hidden" name="id" value="'+r.id+'"><div class="fgrid">'+field('Assigned to','<select name="asg"><option value="">Unassigned</option>'+opts(assignees(r),r.assignee,m=>[m.id,m.name+' · '+m.role])+'</select>')+field('Priority','<select name="prio">'+opts(PRIOS,r.priority)+'</select>')+field('Due date','<input type="date" name="due" value="'+r.due+'">')+field('Status','<select name="st">'+opts(stOpts,r.status)+'</select>')+(r.category==='Medicine'?field('Expected delivery','<input type="date" name="deliv" value="'+r.delivery+'">'):'')+'</div><button class="btn">Save changes</button></form>'+
+ '<h4>Add to history</h4><form data-form="reqNote"><input type="hidden" name="id" value="'+r.id+'">'+field('Type','<select name="kind"><option>Note</option><option>Action taken</option></select>')+field('Details','<textarea name="text" required></textarea>')+'<label class="ck"><input type="checkbox" name="share"> Share with family</label><button class="btn ghost">Add to history</button></form>'+
+ (done||esc_?'<form data-form="reqReopen"><input type="hidden" name="id" value="'+r.id+'"><button class="btn ghost">Reopen as In Progress</button></form>':'<details><summary>Escalate</summary><form data-form="reqEsc"><input type="hidden" name="id" value="'+r.id+'">'+field('Why is this unresolved?','<textarea name="why" required></textarea>')+'<button class="btn danger">Escalate to '+esc(S.team[3].name)+'</button></form></details><details><summary>Mark completed</summary><form data-form="reqDone"><input type="hidden" name="id" value="'+r.id+'">'+field('What was done? (family will see this)','<textarea name="res" required></textarea>')+'<label class="ck"><input type="checkbox" name="ver" required> I have verified this is complete</label><button class="btn">Mark completed</button></form></details>')+
+ '<h4>Activity history</h4>'+rows(r.history,h=>'<div><div class="s">'+esc(h.who)+' · '+fmtTs(h.t)+'</div><div>'+esc(h.text)+'</div></div>','No activity.')+'</div>'}
+function newReqModal(cat){const pts=S.people;return dlgH('New requirement','Care Team')+'<div class="dlg-body"><form data-form="reqNew">'+field('Patient','<select name="pid">'+opts(pts,'',p=>[p.id,p.name+(p.kind==='living'?' (Living)':'')])+'</select>')+field('Requirement','<input name="title" required>')+'<div class="fgrid">'+field('Category','<select name="cat">'+opts(CATS,cat||'Other')+'</select>')+field('Priority','<select name="prio">'+opts(PRIOS,'Medium')+'</select>')+field('Assigned to','<select name="asg"><option value="">Unassigned</option>'+opts(S.team.concat(S.staff),'',m=>[m.id,m.name])+'</select>')+field('Due date','<input type="date" name="due" value="'+D(3)+'">')+'</div><button class="btn">Create requirement</button></form></div>'}
+function incModal(id){const i=S.incidents.find(x=>x.id===id),H=S.team.concat(S.staff);
+ if(!i)return dlgH('Log incident','Emergency Coordination')+'<div class="dlg-body"><form data-form="incNew">'+field('Patient','<select name="pid">'+opts(S.people,'',p=>[p.id,p.name])+'</select>')+field('Reported concern','<textarea name="concern" required></textarea>')+field('Handler','<select name="h">'+opts(H,UI.who.team,m=>[m.id,m.name])+'</select>')+'<button class="btn">Log incident</button></form></div>';
+ return dlgH(esc(i.concern),esc(PP(i.personId).name)+' · '+fmtTs(i.t))+'<div class="dlg-body"><form data-form="incSave"><input type="hidden" name="id" value="'+i.id+'"><div class="fgrid">'+field('Handler','<select name="h">'+opts(H,i.handler,m=>[m.id,m.name])+'</select>')+field('Escalation','<select name="esc">'+opts(['Not escalated','Doctor informed','Escalated to senior manager'],i.esc)+'</select>')+field('Status','<select name="st">'+opts(['Open','Resolved'],i.status)+'</select>')+'</div>'+field('Actions taken','<textarea name="actions">'+esc(i.actions)+'</textarea>')+field('Follow-up','<input name="follow" value="'+esc(i.followup)+'">')+'<button class="btn">Save incident</button></form></div>'}
+function matchModal(pid){const p=PP(pid),pv=S.visits.find(v=>v.personId===pid&&v.status==='Requested'),L=S.companions.map(c=>({c,s:score(p,c)})).sort((a,b)=>b.s.n-a.s.n);
+ return dlgH('Suggested matches for '+esc(p.name),prop('Companionship'))+'<div class="dlg-body">'+(pv?'<p class="s">Request: “'+esc(pv.ask)+'”</p>':'')+L.map(x=>'<div class="card" style="margin-bottom:10px"><div class="t">'+esc(x.c.name)+' <span class="tag">'+x.c.type+'</span></div><div class="s">Shared interests: '+(x.s.si.join(', ')||'none')+' · Shared languages: '+(x.s.sl.join(', ')||'none')+' · Overlapping slots: '+(x.s.sa.join(', ')||'none')+'</div><form data-form="visitAssign" style="margin-top:8px"><input type="hidden" name="pid" value="'+pid+'"><input type="hidden" name="cid" value="'+x.c.id+'"><div class="fgrid"><input type="date" name="date" value="'+D(3)+'" aria-label="Date"><select name="time" aria-label="Time">'+opts(['10:00 AM','11:00 AM','4:00 PM','5:00 PM'],'4:00 PM')+'</select></div><button class="btn sm" style="margin-top:8px">Assign and schedule</button></form></div>').join('')+'</div>'}
+function visitModal(id){const v=S.visits.find(x=>x.id===id);return dlgH('Record interaction',esc(PP(v.personId).name)+' with '+esc(CMP(v.companionId).name))+'<div class="dlg-body"><form data-form="visitRec"><input type="hidden" name="id" value="'+id+'">'+field('How did the visit go?','<textarea name="notes" required></textarea>')+'<div class="fgrid">'+field('Plan next visit (optional)','<input type="date" name="next" value="'+D(7)+'">')+field('Time','<select name="time">'+opts(['10:00 AM','11:00 AM','4:00 PM','5:00 PM'],v.time)+'</select>')+'</div><label class="ck"><input type="checkbox" name="plan" checked> Schedule the next visit</label><button class="btn">Save and share with family</button></form></div>'}
+function eventModal(id){const e=S.events.find(x=>x.id===id),rest=home().filter(p=>!e.participants.includes(p.id));return dlgH(esc(e.title),when(e.date,e.time))+'<div class="dlg-body"><h4>Register a senior</h4><form data-form="evAdd" class="bar"><input type="hidden" name="id" value="'+id+'"><select name="pid" aria-label="Senior">'+opts(rest,'',p=>[p.id,p.name])+'</select><button class="btn sm">Add</button></form><h4>Attendance</h4><form data-form="evDone"><input type="hidden" name="id" value="'+id+'">'+(e.participants.length?e.participants.map(pid=>'<label class="ck"><input type="checkbox" name="att" value="'+pid+'"> '+esc(PP(pid).name)+'</label>').join(''):empty('Nobody registered yet.'))+'<button class="btn">Save attendance and complete event</button></form></div>'}
+function resModal(id){const p=PP(id),ck=S.checkins.filter(k=>k.personId===id&&k.status==='Done').sort((a,b)=>b.doneAt-a.doneAt).slice(0,4);
+ return dlgH(esc(p.name),'Room '+esc(p.room)+' · '+p.age)+'<div class="dlg-body">'+dl([['Conditions',esc(p.conditions.join(', '))],['Doctor',esc(DOC(p.doctorId).name)],['Diet',esc(p.diet)],['Family',esc(famName(p))],['Wellbeing',moodChip(id)]])+'<h4>Care plan</h4>'+rows(p.plan,x=>'<div>'+esc(x)+'</div>')+'<h4>Medicines</h4>'+medTable(id)+'<h4>Recent check-ins</h4>'+rows(ck,k=>'<div>'+chip(k.mood)+' '+esc(k.note)+'</div><div class="s">'+ago(k.doneAt)+'</div>','None.')+'<div style="margin:10px 0">'+btn('Record check-in','checkinFor',{id:id},'sm')+'</div><h4>Assigned caregiver</h4><form data-form="resStaff" class="bar"><input type="hidden" name="id" value="'+id+'"><select name="sid" aria-label="Staff">'+opts(S.staff.filter(s=>s.role!=='Maintenance'),p.staffId,s=>[s.id,s.name+' · '+s.role])+'</select><button class="btn sm">Assign</button></form></div>'}
+function checkinModal(m){const k=m.id?S.checkins.find(x=>x.id===m.id):null,pid=k?k.personId:m.pid;return dlgH('Wellbeing check-in',esc(PP(pid).name))+'<div class="dlg-body"><form data-form="checkin"><input type="hidden" name="id" value="'+(k?k.id:'')+'"><input type="hidden" name="pid" value="'+pid+'"><div class="choices">'+['Good','Okay','Needs attention'].map((x,i)=>'<label class="choice"><input type="radio" name="mood" value="'+x+'"'+(i===0?' checked':'')+'><span>'+x+'</span></label>').join('')+'</div>'+field('Note','<textarea name="note" required></textarea>')+'<label class="ck"><input type="checkbox" name="raise"> Raise a requirement from this note</label><label class="ck"><input type="checkbox" name="next" checked> Schedule the next check-in tomorrow</label><button class="btn">Save check-in</button></form></div>'}
+function modalHtml(){const m=UI.modal;if(!m)return '';let c=true,h='';
+ switch(m.type){case 'req':c=false;h=reqModal(m.id);break;case 'newReq':h=newReqModal(m.cat);break;case 'inc':c=false;h=incModal(m.id);break;case 'match':c=false;h=matchModal(m.id);break;case 'visit':h=visitModal(m.id);break;case 'event':h=eventModal(m.id);break;case 'res':c=false;h=resModal(m.id);break;case 'checkin':h=checkinModal(m);break;
+ case 'call':h=dlgH('Call SATHI Support','Prototype interaction')+'<div class="dlg-body"><div class="bignum">+91 90000 00000</div><p>Demonstration number. No real call is placed.</p><p class="s">In the proposed model, this is a direct phone line that works without the app.</p>'+(m.done?'<p class="t">Call simulated. The Care Team can now see it under Emergency Coordination.</p>':'<form data-form="callSim">'+btn('Simulate calling for urgent help','noop',{},'danger').replace('type="button"','type="submit"')+'</form>')+'</div>';break;
+ case 'reset':h=dlgH('Reset demo data?','')+'<div class="dlg-body"><p>All changes you made will be replaced with the original sample data.</p>'+btn('Reset demo data','resetDo')+' '+btn('Cancel','close',{},'ghost')+'</div>';break;
+ case 'newAppt':h=dlgH('Schedule appointment','Care Team')+'<div class="dlg-body"><form data-form="apptNew">'+field('Patient','<select name="pid">'+opts(S.people,'',p=>[p.id,p.name])+'</select>')+field('Doctor','<select name="doc">'+opts(S.doctors,'',d=>[d.id,d.name])+'</select>')+'<div class="fgrid">'+field('Date','<input type="date" name="date" value="'+D(2)+'">')+field('Time','<select name="time">'+opts(['9:30 AM','10:30 AM','11:00 AM','12:00 PM','4:00 PM','5:00 PM'],'10:30 AM')+'</select>')+'</div>'+field('Reason','<input name="type" required>')+field('Mode','<select name="mode">'+opts(['Clinic visit','Teleconsult','Home visit','On site'],'Teleconsult')+'</select>')+'<button class="btn">Schedule</button></form></div>';break;
+ case 'newEvent':h=dlgH('Create community event',prop('Community'))+'<div class="dlg-body"><form data-form="evNew">'+field('Title','<input name="title" required>')+'<div class="fgrid">'+field('Date','<input type="date" name="date" value="'+D(7)+'">')+field('Time','<select name="time">'+opts(['10:00 AM','4:00 PM','5:00 PM'],'4:00 PM')+'</select>')+'</div>'+field('Place','<input name="place" value="Community hall (proposed venue)">')+field('Description','<textarea name="desc"></textarea>')+'<button class="btn">Create event</button></form></div>';break;
+ case 'newMaint':h=dlgH('New maintenance request',prop('SATHI Living'))+'<div class="dlg-body"><form data-form="maintNew">'+field('Room','<select name="room">'+opts(S.rooms,'',r=>[r.id,'Room '+r.id])+'</select>')+field('Issue','<input name="issue" required>')+field('Assign to','<select name="asg"><option value="">Unassigned</option>'+opts(S.staff,'s4',s=>[s.id,s.name])+'</select>')+'<button class="btn">Create request</button></form></div>';break}
+ return '<div class="ov '+(c?'center':'')+'"><div class="dlg '+(c?'c':'')+'" role="dialog" aria-modal="true" tabindex="-1">'+h+'</div></div>'}
+// ---- shell
+const ROLES=[['senior','Senior'],['doctor','Doctor'],['team','Care Team'],['family','Family']];
+const NAV={senior:[['dash','Dashboard'],['care','My Care'],['request','Request Assistance'],['support','Contact Support'],['community','My Community',1],['living','SATHI Living',1]],doctor:[['dash','Dashboard'],['records','Patient Records'],['update','Clinical Updates']],team:[['dash','Dashboard'],['manage','Care Management'],['meds','Medicine Coordination'],['appts','Appointments & Follow-ups'],['emergency','Emergency Coordination'],['comp','Companionship & Community',1],['living','SATHI Living',1]],family:[['dash','Dashboard'],['track','Care Tracking'],['comms','Communication'],['comp','Companionship & Community',1],['living','SATHI Living',1]]};
+const badgeFor=(r,v)=>r==='team'&&v==='manage'?S.reqs.filter(x=>x.status==='New').length:r==='team'&&v==='emergency'?S.incidents.filter(i=>i.status==='Open').length:r==='team'&&v==='comp'?S.visits.filter(x=>x.status==='Requested').length:0;
+function whoSel(){const r=UI.role;let o='';
+ if(r==='senior')o=opts(home(),UI.who.senior,p=>[p.id,p.name]);if(r==='doctor')o=opts(S.doctors,UI.who.doctor,d=>[d.id,d.name]);if(r==='team')o=opts(S.team,UI.who.team,t=>[t.id,t.name+' · '+t.role]);if(r==='family')o=opts(S.people,UI.who.family,p=>[p.id,p.family.name+' ('+first(p.name)+'\'s '+p.family.rel.split(' ')[0].toLowerCase()+')']);
+ return '<select id="who" data-chg="who" aria-label="Viewing as">'+o+'</select>'}
+function render(){
+ const ae=document.activeElement,fid=ae&&ae.id,sp_=ae&&ae.selectionStart,sc=document.querySelector('.dlg-body'),sct=sc?sc.scrollTop:0,ws=window.scrollY,had=!!sc;
+ document.body.dataset.role=UI.role;const v=UI.view[UI.role];
+ const nav=NAV[UI.role].map(n=>{const b=badgeFor(UI.role,n[0]);return '<button class="'+(v===n[0]?'on':'')+'" data-a="nav" data-v="'+n[0]+'">'+n[1]+(n[2]?' <span class="tag">Proposed</span>':'')+(b?' <span class="badge">'+b+'</span>':'')+'</button>'}).join('');
+ document.getElementById('app').innerHTML='<header class="top"><div class="brand"><span class="mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F8F6F0" stroke-width="2" stroke-linecap="round"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19l7-7"/></svg></span><div><b>SATHI</b><small>Prototype · fictional data</small></div></div><div class="roles" role="tablist" aria-label="Choose interface">'+ROLES.map(r=>'<button role="tab" aria-selected="'+(UI.role===r[0])+'" class="'+(UI.role===r[0]?'on':'')+'" data-a="role" data-v="'+r[0]+'">'+r[1]+'</button>').join('')+'</div><div class="who"><label class="mini" for="who">Viewing as</label>'+whoSel()+'<button class="btn ghost sm" data-a="resetAsk">Reset demo data</button></div></header><div class="shell"><nav class="nav" aria-label="Sections">'+nav+'</nav><main class="main" id="main">'+((views[UI.role][v]||views[UI.role].dash)())+'</main></div>'+modalHtml();
+ if(UI.modal&&!had){const d=document.querySelector('.dlg');if(d)d.focus()}
+ const nb=document.querySelector('.dlg-body');if(nb&&had)nb.scrollTop=sct;
+ if(fid){const el=document.getElementById(fid);if(el&&el!==document.activeElement){el.focus();try{if(sp_!=null)el.setSelectionRange(sp_,sp_)}catch(e){}}}
+ window.scrollTo(0,UI.top?0:ws);UI.top=0}
+// ---- actions
+const open=m=>{UI.modal=m;render()};
+const A={
+ role(d){UI.role=d.v;UI.top=1;UI.modal=null;render()},nav(d){UI.view[UI.role]=d.v;UI.top=1;UI.modal=null;render()},
+ close(){UI.modal=null;render()},noop(){},tab(d){UI.tab[d.k]=d.v;render()},
+ call(){open({type:'call'})},resetAsk(){open({type:'reset'})},resetDo(){S=seed();save();UI.modal=null;UI.f={q:'',status:'',cat:'',prio:'',asg:'',scope:'',mstatus:''};commit('Demo data reset')},
+ taken(d){S.taken[d.id]=true;commit('Marked as taken')},
+ reg(d){const e=S.events.find(x=>x.id===d.id),pid=UI.who.senior,i=e.participants.indexOf(pid);if(i<0){e.participants.push(pid);commit('You are registered')}else{e.participants.splice(i,1);commit('Registration cancelled')}},
+ selPatient(d){UI.sel.doctor=d.id;UI.view.doctor='records';UI.top=1;render()},recordFor(d){UI.updPatient=d.id;UI.view.doctor='update';UI.top=1;render()},
+ tileFilter(d){const a=d.v.split(':');UI.f={q:'',status:'',cat:'',prio:'',asg:'',scope:'',mstatus:''};UI.f[a[0]]=a[1];UI.view.team='manage';UI.top=1;render()},clearF(){UI.f={q:'',status:'',cat:'',prio:'',asg:'',scope:'',mstatus:''};render()},
+ openReq(d){open({type:'req',id:d.id})},newReq(d){open({type:'newReq',cat:d.cat})},openInc(d){open({type:'inc',id:d.id})},newInc(){open({type:'inc',id:null})},
+ openMatch(d){open({type:'match',id:d.id})},recVisit(d){open({type:'visit',id:d.id})},openEvent(d){open({type:'event',id:d.id})},newEvent(){open({type:'newEvent'})},
+ openRes(d){open({type:'res',id:d.id})},checkin(d){open({type:'checkin',id:d.id})},checkinFor(d){open({type:'checkin',id:null,pid:d.id})},newAppt(){open({type:'newAppt'})},newMaint(){open({type:'newMaint'})},
+ apptDone(d){const a=S.appts.find(x=>x.id===d.id);a.status='Completed';addUpdate(a.personId,'Appointment completed with '+DOC(a.doctorId).name+': '+a.type+'.','activity',me());commit('Appointment marked done')},
+ apptCancel(d){const a=S.appts.find(x=>x.id===d.id);a.status='Cancelled';addUpdate(a.personId,'Appointment cancelled: '+a.type+'. The Care Team will rebook.','update',me());commit('Appointment cancelled')},
+ maintNext(d){const m=S.maint.find(x=>x.id===d.id);m.status=m.status==='Open'?'In Progress':'Done';commit('Maintenance updated')},
+ roomMaint(d){const r=S.rooms.find(x=>x.id===d.id);r.maint=!r.maint;commit('Room updated')}};
+const F={
+ seniorReq(fd){const M={'Medicine assistance':['Medicine','Medium'],'Doctor appointment':['Appointment','Medium'],'Health concern':['Health concern','High'],'Home assistance':['Home assistance','Medium'],'Other':['Other','Low']}[val(fd,'cat')],d=val(fd,'desc'),p=sp();createReq({personId:p.id,title:short(d),desc:d,category:M[0],priority:M[1],source:'Senior',by:p.name+' (Senior)'});commit('Request sent to your Care Team')},
+ callback(){const p=sp();createReq({personId:p.id,title:'Call back requested',category:'Other',priority:'Medium',source:'Senior',by:p.name+' (Senior)'});commit('Call back requested')},
+ visitAsk(fd){const p=sp();S.visits.push({id:uid(),personId:p.id,companionId:'',date:'',time:'',status:'Requested',notes:'',ask:val(fd,'ask')+' ('+val(fd,'pref')+')'});addUpdate(p.id,first(p.name)+' asked for a companion visit. The Care Team will find a match.','visit',p.name);commit('Visit requested')},
+ livingReq(fd){const pid=val(fd,'pid'),p=PP(pid),k=val(fd,'kind'),d=val(fd,'desc');if(k==='room'){S.maint.push({id:uid(),roomId:p.room,issue:d,by:p.name,date:T(),assignee:'',status:'Open'});commit('Sent to maintenance')}else{createReq({personId:pid,title:short(d),desc:d,category:k==='health'?'Health concern':'Resident assistance',priority:k==='health'?'High':'Medium',source:'Resident',by:p.name+' (Resident)'});commit('Request sent to the care team')}},
+ famReq(fd){const pid=val(fd,'pid'),d=val(fd,'desc'),t=val(fd,'type'),p=PP(pid);createReq({personId:pid,title:short(d),desc:d,category:t==='concern'?'Family concern':'Other',priority:val(fd,'urgent')?'High':'Medium',source:'Family',by:p.family.name+' (Family)',famText:'We received your '+t+': '+short(d,60)});commit('Sent to the Care Team')},
+ clinical(fd){const pid=val(fd,'pid'),obs=val(fd,'obs'),asm=val(fd,'asm'),plan=val(fd,'plan'),fu=val(fd,'fu'),fdate=val(fd,'fdate');if(!obs&&!asm&&!plan&&!fu)return toast('Enter at least one clinical update.');if(fu&&!fdate)return toast('Set a follow-up date.');
+  const d=DOC(UI.who.doctor),parts=[];
+  if(obs||asm){S.assess.unshift({id:uid(),personId:pid,doctorId:d.id,date:T(),obs:obs||'—',asm:asm||'—'});parts.push('recorded an assessment')}
+  if(plan){plan.split('\n').map(x=>x.trim()).filter(Boolean).forEach(x=>PP(pid).plan.push(x));parts.push('updated the care plan')}
+  if(fu){const r=createReq({personId:pid,title:'Follow-up: '+short(fu,60),desc:fu,category:'Follow-up',priority:val(fd,'urgent')?'High':'Medium',due:fdate,source:'Doctor',by:d.name});S.followups.unshift({id:uid(),personId:pid,doctorId:d.id,instruction:fu,date:fdate,reqId:r.id});parts.push('requested a follow-up by '+fmtDate(fdate))}
+  addUpdate(pid,d.name+' '+parts.join(', ')+'.','clinical',d.name);UI.view.doctor='dash';commit('Saved. Follow-up sent to the Care Team')},
+ reqNew(fd){createReq({personId:val(fd,'pid'),title:val(fd,'title'),category:val(fd,'cat'),priority:val(fd,'prio'),assignee:val(fd,'asg'),due:val(fd,'due'),source:'Care Team',by:me()});UI.modal=null;commit('Requirement created')},
+ reqSave(fd){const r=S.reqs.find(x=>x.id===val(fd,'id')),by=me(),a=val(fd,'asg'),pr=val(fd,'prio'),du=val(fd,'due'),st=val(fd,'st'),dv=fd.get('deliv')==null?r.delivery:val(fd,'deliv');
+  let ch=0,asgCh=false;if(a!==r.assignee){r.assignee=a;logReq(r,by,'Assigned to '+(a?nameOf(a):'nobody'));asgCh=true;ch++}
+  if(pr!==r.priority){r.priority=pr;logReq(r,by,'Priority → '+pr);ch++}if(du&&du!==r.due){r.due=du;logReq(r,by,'Due date → '+fmtDate(du));ch++}
+  if(dv!==r.delivery){r.delivery=dv;logReq(r,by,'Expected delivery → '+fmtDate(dv));ch++}
+  let ns=st;if(asgCh&&a&&r.status==='New'&&st==='New')ns='Assigned';
+  if(ns!==r.status){setStatus(r,ns,by);ch++}else if(asgCh&&a)addUpdate(r.personId,nameOf(a)+' is now responsible for: '+r.title+'.','update',by,r.id);
+  commit(ch?'Changes saved':'No changes')},
+ reqNote(fd){const r=S.reqs.find(x=>x.id===val(fd,'id')),t=val(fd,'text'),k=val(fd,'kind');logReq(r,me(),k+': '+t);if(val(fd,'share'))addUpdate(r.personId,(k==='Action taken'?'Action taken: ':'')+t,'update',me(),r.id);commit('Added to history')},
+ reqEsc(fd){const r=S.reqs.find(x=>x.id===val(fd,'id'));r.priority='High';logReq(r,me(),'Escalated to '+S.team[3].name+': '+val(fd,'why'));setStatus(r,'Escalated',me());commit('Escalated')},
+ reqDone(fd){const r=S.reqs.find(x=>x.id===val(fd,'id'));r.resolution=val(fd,'res');logReq(r,me(),'Verified complete: '+r.resolution);setStatus(r,'Completed',me());UI.modal=null;commit('Marked completed. Family notified')},
+ reqReopen(fd){const r=S.reqs.find(x=>x.id===val(fd,'id'));r.resolution='';setStatus(r,'In Progress',me());commit('Reopened')},
+ incNew(fd){const p=PP(val(fd,'pid'));S.incidents.unshift({id:uid(),personId:p.id,concern:val(fd,'concern'),t:Date.now(),handler:val(fd,'h'),esc:'Not escalated',actions:'',followup:'',status:'Open'});addUpdate(p.id,'Incident logged: '+short(val(fd,'concern'),80)+'. The care team is handling it.','incident',me());UI.modal=null;commit('Incident logged')},
+ incSave(fd){const i=S.incidents.find(x=>x.id===val(fd,'id')),st=val(fd,'st');i.handler=val(fd,'h');i.esc=val(fd,'esc');i.actions=val(fd,'actions');i.followup=val(fd,'follow');if(st!==i.status){i.status=st;addUpdate(i.personId,'Incident '+(st==='Resolved'?'resolved':'reopened')+': '+short(i.concern,80)+'.'+(i.actions?' '+i.actions:''),'incident',me())}UI.modal=null;commit('Incident saved')},
+ callSim(){const p=sp();S.incidents.unshift({id:uid(),personId:p.id,concern:'Urgent help requested by phone (prototype)',t:Date.now(),handler:'',esc:'Not escalated',actions:'',followup:'',status:'Open'});addUpdate(p.id,first(p.name)+' called the support line for urgent help. The care team is responding.','incident','SATHI Support');UI.modal={type:'call',done:1};commit()},
+ visitAssign(fd){const pid=val(fd,'pid'),c=CMP(val(fd,'cid')),pv=S.visits.find(v=>v.personId===pid&&v.status==='Requested'),v=pv||{id:uid(),personId:pid,notes:'',ask:''};v.companionId=c.id;v.date=val(fd,'date');v.time=val(fd,'time');v.status='Scheduled';if(!pv)S.visits.push(v);addUpdate(pid,c.name+' will visit '+first(PP(pid).name)+' on '+when(v.date,v.time)+'.','visit',me());UI.modal=null;commit('Visit scheduled')},
+ visitRec(fd){const v=S.visits.find(x=>x.id===val(fd,'id')),n=val(fd,'notes');v.status='Completed';v.notes=n;let msg='Visit completed with '+CMP(v.companionId).name+': '+n;if(val(fd,'plan')&&val(fd,'next')){S.visits.push({id:uid(),personId:v.personId,companionId:v.companionId,date:val(fd,'next'),time:val(fd,'time'),status:'Scheduled',notes:'',ask:''});msg+=' Next visit: '+when(val(fd,'next'),val(fd,'time'))+'.'}addUpdate(v.personId,msg,'visit',me());UI.modal=null;commit('Interaction recorded')},
+ evNew(fd){S.events.push({id:uid(),title:val(fd,'title'),date:val(fd,'date'),time:val(fd,'time'),place:val(fd,'place'),desc:val(fd,'desc'),participants:[],attended:[],status:'Upcoming'});UI.modal=null;commit('Event created')},
+ evAdd(fd){const e=S.events.find(x=>x.id===val(fd,'id')),pid=val(fd,'pid');if(pid&&!e.participants.includes(pid))e.participants.push(pid);commit('Participant registered')},
+ evDone(fd){const e=S.events.find(x=>x.id===val(fd,'id'));e.attended=fd.getAll('att');e.status='Completed';e.attended.forEach(pid=>addUpdate(pid,first(PP(pid).name)+' attended '+e.title+'.','activity',me()));UI.modal=null;commit('Attendance saved')},
+ apptNew(fd){const a={id:uid(),personId:val(fd,'pid'),doctorId:val(fd,'doc'),date:val(fd,'date'),time:val(fd,'time'),type:val(fd,'type'),mode:val(fd,'mode'),status:'Scheduled'};S.appts.push(a);addUpdate(a.personId,'Appointment booked with '+DOC(a.doctorId).name+' on '+when(a.date,a.time)+': '+a.type+'.','activity',me());UI.modal=null;commit('Appointment scheduled')},
+ checkin(fd){const id=val(fd,'id'),pid=val(fd,'pid'),mood=val(fd,'mood'),note=val(fd,'note'),by=UI.role==='team'?UI.who.team:'s1';let k=id?S.checkins.find(x=>x.id===id):null;
+  if(!k){k={id:uid(),personId:pid,date:T(),time:'',by,mode:'On site'};S.checkins.push(k)}
+  Object.assign(k,{status:'Done',mood,note,doneAt:Date.now()});addUpdate(pid,'Check-in: '+first(PP(pid).name)+' is '+(mood==='Good'?'doing well':mood==='Okay'?'okay':'in need of attention')+'. '+note,'activity',me());
+  if(val(fd,'raise'))createReq({personId:pid,title:short(note),desc:note,category:'Health concern',priority:'High',source:'Care Team',by:me(),famText:null});
+  if(val(fd,'next')){S.checkins.push({id:uid(),personId:pid,date:D(1),time:k.time||'10:00 AM',by:k.by,mode:k.mode,status:'Scheduled',mood:'',note:'',doneAt:0})}
+  UI.modal=null;commit('Check-in recorded')},
+ roomAlloc(fd){PP(val(fd,'pid')).room=val(fd,'room');commit('Room allocated')},
+ resStaff(fd){PP(val(fd,'id')).staffId=val(fd,'sid');commit('Caregiver assigned')},
+ famPost(fd){addUpdate(val(fd,'pid'),val(fd,'text'),'notice','SATHI Living team');commit('Update sent to family')},
+ maintNew(fd){S.maint.push({id:uid(),roomId:val(fd,'room'),issue:val(fd,'issue'),by:me(),date:T(),assignee:val(fd,'asg'),status:'Open'});UI.modal=null;commit('Maintenance request created')}};
+document.addEventListener('click',e=>{const o=e.target.classList&&e.target.classList.contains('ov')?e.target:null;if(o){UI.modal=null;render();return}
+ const el=e.target.closest('[data-a]');if(!el)return;const h=A[el.dataset.a];if(h){e.preventDefault();h(el.dataset,el)}});
+document.addEventListener('submit',e=>{const f=e.target.closest('form[data-form]');if(!f)return;e.preventDefault();const h=F[f.dataset.form];if(h)h(new FormData(f))});
+document.addEventListener('change',e=>{const el=e.target.closest('[data-chg]');if(!el)return;const t=el.dataset.chg;
+ if(t==='who'){UI.who[UI.role]=el.value;UI.sel.doctor=null;UI.updPatient=null;render()}
+ else if(t==='f'){UI.f[el.dataset.k]=el.value;render()}else if(t==='livingRes'){UI.livingRes[UI.role]=el.value;render()}});
+document.addEventListener('input',e=>{const el=e.target.closest('[data-inp]');if(el){UI.f.q=el.value;render()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.modal){UI.modal=null;render()}});
+render();
+})();
+</script>
+
+</body></html>
